@@ -70,7 +70,7 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-    <div class="app-container shadow-2xl relative pb-20">
+    <div class="app-container shadow-2xl relative pb-24">
 
         <!-- Lock Screen -->
         <div id="lockScreen" class="fixed inset-0 bg-slate-900 z-50 flex flex-col items-center justify-center p-6 text-white max-w-[480px] mx-auto">
@@ -78,22 +78,14 @@
                 <img src="./ahmed logo.jpg" alt="Ahmed Logo" class="w-full h-full object-cover">
             </div>
             <h1 class="text-2xl font-bold mb-2">Abo Said App</h1>
-            <p class="text-gray-400 text-sm mb-6 text-center">مرحباً بك يا أحمد، يرجى إدخال كلمة المرور أو استخدام البصمة</p>
+            <p class="text-gray-400 text-sm mb-8 text-center">مرحباً بك يا أحمد، يرجى إدخال كلمة المرور</p>
             
             <div class="w-full max-w-xs space-y-4">
                 <input type="password" id="passwordInput" placeholder="كلمة المرور" class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-center text-lg focus:outline-none focus:border-indigo-500 transition">
-                
                 <button onclick="checkPassword()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-lg transition active:scale-95">
-                    دخول بكلمة السر
+                    دخول
                 </button>
-
-                <!-- زر الدخول بالبصمة -->
-                <button id="biometricLoginBtn" onclick="loginWithBiometrics()" class="w-full bg-slate-800 border border-indigo-500/50 hover:bg-slate-700 text-indigo-300 font-semibold py-3 rounded-xl shadow-lg transition flex items-center justify-center gap-2 active:scale-95 hidden">
-                    <i class="fa-solid fa-fingerprint text-xl text-indigo-400"></i>
-                    الدخول ببصمة الاصبع
-                </button>
-
-                <p id="loginError" class="text-red-400 text-xs text-center hidden">كلمة المرور أو البصمة غير صحيحة!</p>
+                <p id="loginError" class="text-red-400 text-xs text-center hidden">كلمة المرور غير صحيحة!</p>
             </div>
         </div>
 
@@ -110,15 +102,9 @@
                     </span>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <!-- زر تسجيل البصمة داخل التطبيق -->
-                <button onclick="registerBiometrics()" title="ربط البصمة" class="text-indigo-200 hover:text-white p-2 text-sm flex items-center gap-1 bg-indigo-700/50 rounded-lg">
-                    <i class="fa-solid fa-fingerprint"></i>
-                </button>
-                <button onclick="lockApp()" class="text-indigo-200 hover:text-white p-2 text-sm flex items-center gap-1">
-                    <i class="fa-solid fa-right-from-bracket"></i> قفل
-                </button>
-            </div>
+            <button onclick="lockApp()" class="text-indigo-200 hover:text-white p-2 text-sm flex items-center gap-1">
+                <i class="fa-solid fa-right-from-bracket"></i> قفل
+            </button>
         </header>
 
         <!-- Main Content Area -->
@@ -208,25 +194,49 @@
                 </div>
             </section>
 
+            <!-- MODULE 5: CHAT BOX -->
+            <section id="mod-chat" class="tab-content space-y-4 hidden flex flex-col h-[75vh]">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex-1 flex flex-col justify-between">
+                    <h3 class="font-bold text-gray-800 text-sm mb-3 pb-2 border-b">مفكرة الشات السريعة</h3>
+                    
+                    <!-- Chat Messages List -->
+                    <div id="chatList" class="space-y-3 overflow-y-auto flex-1 pr-1 hide-scrollbar max-h-[50vh]">
+                        <p class="text-xs text-gray-400 text-center py-4">لا توجد رسائل بعد...</p>
+                    </div>
+
+                    <!-- Chat Input Form -->
+                    <form id="chatForm" onsubmit="addChatMessage(event)" class="mt-3 pt-2 border-t flex gap-2">
+                        <input type="text" id="chatInputText" placeholder="اكتب رسالة أو ملاحظة..." required class="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+                        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-700 transition flex items-center justify-center">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
         </main>
 
-        <!-- Bottom Navigation Bar -->
+        <!-- Bottom Navigation Bar (5 Tabs) -->
         <nav class="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto bg-white border-t border-gray-200 flex justify-around p-2 z-30">
-            <button onclick="switchTab('finances')" id="nav-finances" class="flex flex-col items-center gap-1 text-indigo-600 w-1/4">
-                <i class="fa-solid fa-wallet text-lg"></i>
-                <span class="text-[10px] font-semibold">الأموال</span>
+            <button onclick="switchTab('finances')" id="nav-finances" class="flex flex-col items-center gap-1 text-indigo-600 w-1/5">
+                <i class="fa-solid fa-wallet text-base"></i>
+                <span class="text-[9px] font-semibold">الأموال</span>
             </button>
-            <button onclick="switchTab('tasks')" id="nav-tasks" class="flex flex-col items-center gap-1 text-gray-400 w-1/4">
-                <i class="fa-solid fa-list-check text-lg"></i>
-                <span class="text-[10px] font-semibold">المهام</span>
+            <button onclick="switchTab('tasks')" id="nav-tasks" class="flex flex-col items-center gap-1 text-gray-400 w-1/5">
+                <i class="fa-solid fa-list-check text-base"></i>
+                <span class="text-[9px] font-semibold">المهام</span>
             </button>
-            <button onclick="switchTab('passwords')" id="nav-passwords" class="flex flex-col items-center gap-1 text-gray-400 w-1/4">
-                <i class="fa-solid fa-key text-lg"></i>
-                <span class="text-[10px] font-semibold">كلمات السر</span>
+            <button onclick="switchTab('passwords')" id="nav-passwords" class="flex flex-col items-center gap-1 text-gray-400 w-1/5">
+                <i class="fa-solid fa-key text-base"></i>
+                <span class="text-[9px] font-semibold">السرية</span>
             </button>
-            <button onclick="switchTab('health')" id="nav-health" class="flex flex-col items-center gap-1 text-gray-400 w-1/4">
-                <i class="fa-solid fa-heart-pulse text-lg"></i>
-                <span class="text-[10px] font-semibold">الصحة</span>
+            <button onclick="switchTab('health')" id="nav-health" class="flex flex-col items-center gap-1 text-gray-400 w-1/5">
+                <i class="fa-solid fa-heart-pulse text-base"></i>
+                <span class="text-[9px] font-semibold">الصحة</span>
+            </button>
+            <button onclick="switchTab('chat')" id="nav-chat" class="flex flex-col items-center gap-1 text-gray-400 w-1/5">
+                <i class="fa-solid fa-comments text-base"></i>
+                <span class="text-[9px] font-semibold">الشات</span>
             </button>
         </nav>
 
@@ -234,7 +244,6 @@
 
     <!-- Application Script -->
     <script>
-        // إعدادات فايربيس الخاص بك
         const firebaseConfig = {
             apiKey: "AIzaSyAmbQaIWA0KLQGHD1aeTHfUcl4RIHtmQNY",
             authDomain: "abo-said-app-ee7fc.firebaseapp.com",
@@ -246,96 +255,24 @@
             measurementId: "G-8HR3Z97XKX"
         };
 
-        // تهيئة فايربيس
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
         const APP_PASS = "ahmed123";
-
-        // التحقق من دعم الجهاز للبصمة عند التحميل
-        window.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('biometricRegistered') === 'true' && window.PublicKeyCredential) {
-                document.getElementById('biometricLoginBtn').classList.remove('hidden');
-            }
-        });
 
         function checkPassword() {
             const pass = document.getElementById('passwordInput').value;
             if(pass === APP_PASS) {
-                unlockAppSuccess();
+                document.getElementById('lockScreen').classList.add('hidden');
+                document.getElementById('loginError').classList.add('hidden');
+                initFirebaseListeners();
             } else {
                 document.getElementById('loginError').classList.remove('hidden');
             }
         }
 
-        function unlockAppSuccess() {
-            document.getElementById('lockScreen').classList.add('hidden');
-            document.getElementById('loginError').classList.add('hidden');
-            initFirebaseListeners();
-        }
-
         function lockApp() {
             document.getElementById('lockScreen').classList.remove('hidden');
             document.getElementById('passwordInput').value = '';
-        }
-
-        // --- وظائف بصمة الإصبع / WebAuthn ---
-        async function registerBiometrics() {
-            if (!window.PublicKeyCredential) {
-                alert('جهازك أو متصفحك لا يدعم خاصية البصمة.');
-                return;
-            }
-
-            try {
-                const publicKeyCredentialCreationOptions = {
-                    challenge: Uint8Array.from("abosaid_secret_challenge", c => c.charCodeAt(0)),
-                    rp: { name: "Abo Said App" },
-                    user: {
-                        id: Uint8Array.from("ahmed_user_id", c => c.charCodeAt(0)),
-                        name: "Ahmed",
-                        displayName: "Abo Said"
-                    },
-                    pubKeyCredParams: [{ alg: -7, type: "public-key" }],
-                    authenticatorSelection: { authenticatorAttachment: "platform" },
-                    timeout: 60000
-                };
-
-                const credential = await navigator.credentials.create({
-                    publicKey: publicKeyCredentialCreationOptions
-                });
-
-                if (credential) {
-                    localStorage.setItem('biometricRegistered', 'true');
-                    document.getElementById('biometricLoginBtn').classList.remove('hidden');
-                    alert('تم ربط بصمة الجهاز بنجاح! يمكنك الآن الدخول بالبصمة مباشرة.');
-                }
-            } catch (err) {
-                console.error(err);
-                alert('لم يتم تسجيل البصمة أو تم إلغاء العملية.');
-            }
-        }
-
-        async function loginWithBiometrics() {
-            if (!window.PublicKeyCredential) return;
-
-            try {
-                const publicKeyCredentialRequestOptions = {
-                    challenge: Uint8Array.from("abosaid_secret_challenge", c => c.charCodeAt(0)),
-                    timeout: 60000
-                };
-
-                const assertion = await navigator.credentials.get({
-                    publicKey: publicKeyCredentialRequestOptions
-                });
-
-                if (assertion) {
-                    unlockAppSuccess();
-                }
-            } catch (err) {
-                console.error(err);
-                document.getElementById('loginError').innerText = 'فشل الدخول بالبصمة!';
-                document.getElementById('loginError').classList.remove('hidden');
-            }
         }
 
         function switchTab(tab) {
@@ -385,139 +322,3 @@
                         </div>
                     `;
                 });
-                document.getElementById('totalFinance').innerText = `${total} ج.م`;
-            });
-
-            // Listen Tasks
-            db.ref('tasks').on('value', (snapshot) => {
-                const data = snapshot.val();
-                const list = document.getElementById('taskList');
-                list.innerHTML = '';
-
-                if(!data) {
-                    list.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">لا توجد مهام بعد</p>';
-                    return;
-                }
-
-                Object.keys(data).forEach(id => {
-                    const item = data[id];
-                    list.innerHTML += `
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl text-xs">
-                            <div class="flex items-center gap-2">
-                                <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleTask('${id}', ${!item.done})" class="rounded text-indigo-600">
-                                <span class="${item.done ? 'line-through text-gray-400' : 'text-gray-800'} font-semibold">${item.title}</span>
-                            </div>
-                            <button onclick="deleteData('tasks', '${id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    `;
-                });
-            });
-
-            // Listen Passwords
-            db.ref('passwords').on('value', (snapshot) => {
-                const data = snapshot.val();
-                const list = document.getElementById('passList');
-                list.innerHTML = '';
-
-                if(!data) {
-                    list.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">لا توجد كلمات سر محفوظة</p>';
-                    return;
-                }
-
-                Object.keys(data).forEach(id => {
-                    const item = data[id];
-                    list.innerHTML += `
-                        <div class="p-3 bg-gray-50 rounded-xl text-xs space-y-1">
-                            <div class="flex justify-between font-bold text-gray-800">
-                                <span>${item.service}</span>
-                                <button onclick="deleteData('passwords', '${id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                            <div class="text-gray-500">المستخدم: ${item.user}</div>
-                            <div class="text-indigo-600 font-mono">كلمة السر: ${item.pass}</div>
-                        </div>
-                    `;
-                });
-            });
-
-            // Listen Health
-            db.ref('health').on('value', (snapshot) => {
-                const data = snapshot.val();
-                const list = document.getElementById('healthList');
-                list.innerHTML = '';
-
-                if(!data) {
-                    list.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">لا يوجد سجل صحي</p>';
-                    return;
-                }
-
-                Object.keys(data).forEach(id => {
-                    const item = data[id];
-                    list.innerHTML += `
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl text-xs">
-                            <div>
-                                <div class="font-bold text-gray-800">${item.title}</div>
-                                <div class="text-[10px] text-gray-400">${item.date}</div>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span class="font-bold text-indigo-600">${item.val}</span>
-                                <button onclick="deleteData('health', '${id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </div>
-                    `;
-                });
-            });
-        }
-
-        // Add Functions
-        function addFinance(e) {
-            e.preventDefault();
-            db.ref('finances').push({
-                title: document.getElementById('finTitle').value,
-                amount: document.getElementById('finAmount').value,
-                type: document.getElementById('finType').value,
-                date: new Date().toLocaleDateString('ar-EG')
-            });
-            document.getElementById('financeForm').reset();
-        }
-
-        function addTask(e) {
-            e.preventDefault();
-            db.ref('tasks').push({
-                title: document.getElementById('taskTitle').value,
-                done: false
-            });
-            document.getElementById('taskForm').reset();
-        }
-
-        function toggleTask(id, status) {
-            db.ref(`tasks/${id}`).update({ done: status });
-        }
-
-        function addPassword(e) {
-            e.preventDefault();
-            db.ref('passwords').push({
-                service: document.getElementById('passService').value,
-                user: document.getElementById('passUser').value,
-                pass: document.getElementById('passVal').value
-            });
-            document.getElementById('passForm').reset();
-        }
-
-        function addHealth(e) {
-            e.preventDefault();
-            db.ref('health').push({
-                title: document.getElementById('healthTitle').value,
-                val: document.getElementById('healthVal').value,
-                date: new Date().toLocaleDateString('ar-EG')
-            });
-            document.getElementById('healthForm').reset();
-        }
-
-        function deleteData(path, id) {
-            if(confirm('هل أنت تأكد من الحذف؟')) {
-                db.ref(`${path}/${id}`).remove();
-            }
-        }
-    </script>
-</body>
-</html>
