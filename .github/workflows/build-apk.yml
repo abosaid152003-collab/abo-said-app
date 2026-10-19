@@ -30,18 +30,23 @@ jobs:
         run: |
           rm -rf android www package*.json capacitor.config.*
           mkdir -p www
-          cp -r index.html manifest.json ahmed\ logo.png www/ 2>/dev/null || true
+          cp -r index.html manifest.json my-logo.png www/ 2>/dev/null || true
 
-      - name: Install Capacitor
+      - name: Install Capacitor & Assets Tool
         run: |
           npm init -y
           npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
+          npm install -g @capacitor/assets
 
       - name: Initialize & Sync Capacitor
         run: |
           npx cap init "Abo Said" "com.abosaid.app" --web-dir www
           npx cap add android
           npx cap sync android
+
+      - name: Generate App Icon
+        run: |
+          npx capacitor-assets generate --iconPath "my-logo.png" --android
 
       - name: Build Android APK
         run: |
