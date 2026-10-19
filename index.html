@@ -156,19 +156,25 @@
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
                 <div class="flex justify-between items-center border-b pb-3">
                     <div>
-                        <h2 class="text-base font-bold text-gray-800">🕌 الصلوات اليومية</h2>
-                        <p class="text-xs text-gray-500">تتجدد تلقائياً لـ (-1) مع بداية كل يوم جديد</p>
+                        <h2 class="text-base font-bold text-gray-800">🕌 الصلوات اليومية (اليوم)</h2>
+                        <p class="text-xs text-gray-500">تُرحَّل الصلوات غير المصلَّاة تلقائيًا للفائتة في منتصف الليل</p>
                     </div>
                     <button onclick="resetDailyPrayers()" class="text-xs text-red-500 hover:underline">إعادة ضبط (-1)</button>
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3" id="daily-prayers-grid"></div>
             </div>
 
+            <!-- سجل أداء الصلوات الأيام السابقة -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-3">
+                <h3 class="text-base font-bold text-gray-800">📅 السجل اليومي للصلوات السابقة</h3>
+                <div id="prayer-history-list" class="space-y-2 max-h-60 overflow-y-auto pr-1 divide-y"></div>
+            </div>
+
             <!-- الصلوات الفائتة -->
             <div class="bg-black text-white p-6 rounded-3xl shadow-xl space-y-6">
                 <div class="text-center space-y-1">
                     <h2 class="text-xl font-black text-gray-100">جدول الصلوات الفائتة</h2>
-                    <p class="text-xs text-gray-400">من 15 يناير 2021 إلى 18 أكتوبر 2026، شاملاً اليوم كاملًا</p>
+                    <p class="text-xs text-gray-400">تزيد تلقائيًا إذا لم تؤدِّ صلاة اليوم</p>
                     <div class="pt-3">
                         <span class="text-3xl md:text-5xl font-black text-white" id="total-missed-display">-10,515</span>
                         <span class="text-sm font-bold text-gray-400 mr-2">صلاة</span>
@@ -215,27 +221,27 @@
             transactions: [],
             dailyPrayers: { fajr: -1, dhuhr: -1, asr: -1, maghrib: -1, isha: -1 },
             missedPrayers: { fajr: -2103, dhuhr: -2103, asr: -2103, maghrib: -2103, isha: -2103 },
+            prayerLogs: [], // سجل الصلوات اليومية السابق
             lastDay: ''
         };
 
-        // استرجاع البيانات المحلية
         try {
-            const saved = localStorage.getItem('abosaid_local_db');
+            const saved = localStorage.getItem('abosaid_local_db_v14');
             if (saved) appState = JSON.parse(saved);
         } catch(e){}
 
         const prayerNames = { fajr: 'الفجر', dhuhr: 'الظهر', asr: 'العصر', maghrib: 'المغرب', isha: 'العشاء' };
         const bankInfo = { bm: { name: 'بنك مصر', curr: 'EGP' }, tinkoff: { name: 'بنك تينكوف', curr: 'RUB' }, ozon: { name: 'بنك أوزون', curr: 'RUB' } };
 
-        // الاستماع لـ Firebase عند التوفر
         if (db) {
-            db.ref('app_data').on('value', (snapshot) => {
+            db.ref('app_data_v14').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     if (data.balances) appState.balances = data.balances;
                     if (data.transactions) appState.transactions = data.transactions;
                     if (data.dailyPrayers) appState.dailyPrayers = data.dailyPrayers;
                     if (data.missedPrayers) appState.missedPrayers = data.missedPrayers;
+                    if (data.prayerLogs) appState.prayerLogs = data.prayerLogs;
                     if (data.lastDay) appState.lastDay = data.lastDay;
                     saveDataLocal();
                 }
@@ -246,17 +252,16 @@
         }
 
         function saveDataLocal() {
-            try { localStorage.setItem('abosaid_local_db', JSON.stringify(appState)); } catch(e){}
+            try { localStorage.setItem('abosaid_local_db_v14', JSON.stringify(appState)); } catch(e){}
         }
 
         function saveData() {
             saveDataLocal();
             if (db) {
-                db.ref('app_data').set(appState);
+                db.ref('app_data_v14').set(appState);
             }
         }
 
-        // تسجيل الدخول بطريقة مضمونة المباشرة
         document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const inputPass = document.getElementById('login-password').value;
@@ -278,10 +283,30 @@
             document.body.classList.add('flex', 'items-center', 'justify-center');
         });
 
+        // التجديد التلقائي وحساب الصلوات الفائتة لليوم السابق
         function checkNewDay() {
             const todayStr = new Date().toLocaleDateString('ar-EG');
-            if (appState.lastDay !== todayStr) {
+            if (appState.lastDay && appState.lastDay !== todayStr) {
+                // حفظ سجل اليوم السابق
+                const logEntry = {
+                    date: appState.lastDay,
+                    prayers: { ...appState.dailyPrayers }
+                };
+                if (!appState.prayerLogs) appState.prayerLogs = [];
+                appState.prayerLogs.unshift(logEntry);
+
+                // خصم الصلوات التي لم تصَلَّ (-1) وتزويد الفائتة بالسالب
+                for (let key in appState.dailyPrayers) {
+                    if (appState.dailyPrayers[key] === -1) {
+                        appState.missedPrayers[key] -= 1; // زيادة الفائتة
+                    }
+                }
+
+                // صفر اليوم الجديد
                 appState.dailyPrayers = { fajr: -1, dhuhr: -1, asr: -1, maghrib: -1, isha: -1 };
+                appState.lastDay = todayStr;
+                saveData();
+            } else if (!appState.lastDay) {
                 appState.lastDay = todayStr;
                 saveData();
             }
@@ -303,7 +328,7 @@
             document.getElementById('tinkoff-balance').innerText = appState.balances.tinkoff.toLocaleString() + ' RUB';
             document.getElementById('ozon-balance').innerText = appState.balances.ozon.toLocaleString() + ' RUB';
 
-            // مؤشر اليوم
+            // مؤشر اليوم المالية
             const todayStr = new Date().toLocaleDateString('ar-EG');
             let todayInc = 0, todayExp = 0;
             const tBody = document.getElementById('trans-table');
@@ -356,6 +381,27 @@
                     <div class="text-[10px] px-2 py-0.5 rounded-full ${isDone ? 'bg-green-200 text-green-800 font-bold' : 'bg-red-200 text-red-800'}">${isDone ? 'تمت ✓' : 'لم تُصَلَّ (-1)'}</div>
                 `;
                 dGrid.appendChild(card);
+            }
+
+            // عرض سجل الصلوات التاريخية
+            const pHistoryContainer = document.getElementById('prayer-history-list');
+            pHistoryContainer.innerHTML = '';
+            if (appState.prayerLogs && appState.prayerLogs.length > 0) {
+                appState.prayerLogs.forEach(log => {
+                    const row = document.createElement('div');
+                    row.className = "pt-2 flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs gap-1";
+                    
+                    let badges = '';
+                    for (let pKey in log.prayers) {
+                        const done = log.prayers[pKey] === 0;
+                        badges += `<span class="px-2 py-0.5 rounded ${done ? 'bg-green-100 text-green-700 font-bold' : 'bg-red-100 text-red-600'}">${prayerNames[pKey]}: ${done ? '✓' : '✗'}</span> `;
+                    }
+
+                    row.innerHTML = `<span class="font-bold text-gray-500 min-w-24">${log.date}</span><div class="flex flex-wrap gap-1">${badges}</div>`;
+                    pHistoryContainer.appendChild(row);
+                });
+            } else {
+                pHistoryContainer.innerHTML = `<p class="text-xs text-gray-400 text-center py-2">لا توجد سجلات أيام سابقة بعد.</p>`;
             }
 
             // الصلوات الفائتة
