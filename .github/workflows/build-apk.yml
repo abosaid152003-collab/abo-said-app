@@ -30,15 +30,15 @@ jobs:
         run: |
           rm -rf android www package*.json capacitor.config.* assets
           mkdir -p www assets
-          # نسخ ملفات الويب بشكل صريح لضمان تحديث index.html
-          cp index.html www/
-          cp manifest.json www/ 2>/dev/null || true
-          cp "ahmed logo.png" www/ 2>/dev/null || true
+          # نسخ ملف HTML الأساسي بشكل مباشر وصريح
+          cp -f index.html www/
+          cp -f manifest.json www/ 2>/dev/null || true
+          cp -f "ahmed logo.png" www/ 2>/dev/null || true
           # تجهيز الأيقونات
-          cp "ahmed logo.png" assets/icon-only.png 2>/dev/null || true
-          cp "ahmed logo.png" assets/icon-foreground.png 2>/dev/null || true
-          cp "ahmed logo.png" assets/icon-background.png 2>/dev/null || true
-          cp "ahmed logo.png" assets/splash.png 2>/dev/null || true
+          cp -f "ahmed logo.png" assets/icon-only.png 2>/dev/null || true
+          cp -f "ahmed logo.png" assets/icon-foreground.png 2>/dev/null || true
+          cp -f "ahmed logo.png" assets/icon-background.png 2>/dev/null || true
+          cp -f "ahmed logo.png" assets/splash.png 2>/dev/null || true
 
       - name: Install Capacitor & Assets Tool
         run: |
