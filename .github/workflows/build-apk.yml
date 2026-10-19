@@ -30,7 +30,11 @@ jobs:
         run: |
           rm -rf android www package*.json capacitor.config.* assets
           mkdir -p www assets
-          cp -r index.html manifest.json "ahmed logo.png" www/ 2>/dev/null || true
+          # نسخ ملفات الويب بشكل صريح لضمان تحديث index.html
+          cp index.html www/
+          cp manifest.json www/ 2>/dev/null || true
+          cp "ahmed logo.png" www/ 2>/dev/null || true
+          # تجهيز الأيقونات
           cp "ahmed logo.png" assets/icon-only.png 2>/dev/null || true
           cp "ahmed logo.png" assets/icon-foreground.png 2>/dev/null || true
           cp "ahmed logo.png" assets/icon-background.png 2>/dev/null || true
@@ -50,7 +54,7 @@ jobs:
 
       - name: Generate App Icon & Splash
         run: |
-          npx capacitor-assets generate --android
+          npx capacitor-assets generate --android || true
 
       - name: Build Android APK
         run: |
