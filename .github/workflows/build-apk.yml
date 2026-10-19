@@ -29,14 +29,15 @@ jobs:
       - name: Clean & Prepare Web Directory
         run: |
           rm -rf android www package*.json capacitor.config.*
-          mkdir -p www
+          mkdir -p www resources
           cp -r index.html manifest.json my-logo.png www/ 2>/dev/null || true
+          cp my-logo.png resources/icon.png 2>/dev/null || true
 
-      - name: Install Capacitor & Assets Tool
+      - name: Install Capacitor & Res Tool
         run: |
           npm init -y
           npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
-          npm install -g @capacitor/assets
+          npm install -g cordova-res
 
       - name: Initialize & Sync Capacitor
         run: |
@@ -46,7 +47,7 @@ jobs:
 
       - name: Generate App Icon
         run: |
-          npx capacitor-assets generate --iconPath "my-logo.png" --android
+          cordova-res android --skip-config --copy
 
       - name: Build Android APK
         run: |
