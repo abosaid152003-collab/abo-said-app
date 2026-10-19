@@ -32,6 +32,7 @@ jobs:
           mkdir -p www resources
           cp -r index.html manifest.json my-logo.png www/ 2>/dev/null || true
           cp my-logo.png resources/icon.png 2>/dev/null || true
+          cp my-logo.png resources/splash.png 2>/dev/null || true
 
       - name: Install Capacitor & Res Tool
         run: |
@@ -45,9 +46,9 @@ jobs:
           npx cap add android
           npx cap sync android
 
-      - name: Generate App Icon
+      - name: Generate App Icon & Splash
         run: |
-          cordova-res android --icon --skip-config --copy
+          cordova-res android --skip-config --copy
 
       - name: Build Android APK
         run: |
