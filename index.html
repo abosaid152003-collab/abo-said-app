@@ -7,6 +7,11 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
     <style>
         body { font-family: 'Cairo', sans-serif; }
     </style>
@@ -48,7 +53,7 @@
             <div class="text-center flex flex-col items-center">
                 <img src="ahmed logo.png" alt="Abo Said Logo" class="w-16 h-16 rounded-full object-cover border-2 border-blue-600 shadow-sm mb-2" onerror="this.src='https://via.placeholder.com/150'">
                 <h1 class="text-xl md:text-2xl font-black text-gray-800 mb-1">Welcome in Abo Said App</h1>
-                <p class="text-xs text-emerald-600 font-bold mb-4">🟢 متصل بالسحابة (Firebase Connected)</p>
+                <p id="sync-status" class="text-xs text-emerald-600 font-bold mb-4">🟢 متصل بالسحابة (Firebase)</p>
             </div>
             
             <div class="flex justify-center gap-2 border-t pt-4">
@@ -116,4 +121,349 @@
                     <select id="t-bank" class="p-2.5 bg-gray-50 border rounded-xl text-sm">
                         <option value="bm">بنك مصر (EGP)</option>
                         <option value="tinkoff">بنك تينكوف (RUB)</option>
-                        <option value="oz
+                        <option value="ozon">بنك أوزون (RUB)</option>
+                    </select>
+                    <input type="text" id="t-cat" placeholder="التصنيف" class="p-2.5 bg-gray-50 border rounded-xl text-sm">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm">حفظ العملية</button>
+                </form>
+            </div>
+
+            <!-- سجل العمليات -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="text-base font-bold text-gray-800 mb-3">سجل العمليات المالية</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b text-gray-400 text-xs">
+                                <th class="pb-2">النوع</th>
+                                <th class="pb-2">الوصف</th>
+                                <th class="pb-2">المبلغ</th>
+                                <th class="pb-2">البنك</th>
+                                <th class="pb-2">التصنيف</th>
+                                <th class="pb-2">التاريخ</th>
+                                <th class="pb-2 text-center">حذف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trans-table" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ب) قسم الصلوات -->
+        <div id="section-prayers" class="space-y-5 hidden">
+            <!-- الصلوات اليومية -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <div>
+                        <h2 class="text-base font-bold text-gray-800">🕌 الصلوات اليومية</h2>
+                        <p class="text-xs text-gray-500">تتجدد تلقائياً لـ (-1) مع بداية كل يوم جديد</p>
+                    </div>
+                    <button onclick="resetDailyPrayers()" class="text-xs text-red-500 hover:underline">إعادة ضبط (-1)</button>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3" id="daily-prayers-grid"></div>
+            </div>
+
+            <!-- الصلوات الفائتة -->
+            <div class="bg-black text-white p-6 rounded-3xl shadow-xl space-y-6">
+                <div class="text-center space-y-1">
+                    <h2 class="text-xl font-black text-gray-100">جدول الصلوات الفائتة</h2>
+                    <p class="text-xs text-gray-400">من 15 يناير 2021 إلى 18 أكتوبر 2026، شاملاً اليوم كاملًا</p>
+                    <div class="pt-3">
+                        <span class="text-3xl md:text-5xl font-black text-white" id="total-missed-display">-10,515</span>
+                        <span class="text-sm font-bold text-gray-400 mr-2">صلاة</span>
+                    </div>
+                </div>
+
+                <div class="divide-y divide-gray-800 border-t border-b border-gray-800 py-2 space-y-2" id="missed-prayers-list"></div>
+
+                <div class="flex justify-between items-center pt-2">
+                    <span class="text-gray-400 text-sm font-bold">الإجمالي الفائت</span>
+                    <span class="text-xl font-black text-red-500" id="total-missed-summary">-10,515</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAmbQaIWA0KLQGHD1aeTHfUcl4RIHtmQNY",
+            authDomain: "abo-said-app-ee7fc.firebaseapp.com",
+            databaseURL: "https://abo-said-app-ee7fc-default-rtdb.firebaseio.com",
+            projectId: "abo-said-app-ee7fc",
+            storageBucket: "abo-said-app-ee7fc.firebasestorage.app",
+            messagingSenderId: "661467346684",
+            appId: "1:661467346684:web:ab75192bc0b52910470979",
+            measurementId: "G-0F7WKZ4H8L"
+        };
+
+        // تهيئة Firebase
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+        } catch(e) {
+            console.error("Firebase Init Error:", e);
+        }
+
+        const PASSWORD = "ahmed123";
+
+        // بيانات التطبيق الشاملة
+        let appState = {
+            balances: { bm: 0, tinkoff: 0, ozon: 0 },
+            transactions: [],
+            dailyPrayers: { fajr: -1, dhuhr: -1, asr: -1, maghrib: -1, isha: -1 },
+            missedPrayers: { fajr: -2103, dhuhr: -2103, asr: -2103, maghrib: -2103, isha: -2103 },
+            lastDay: ''
+        };
+
+        const prayerNames = { fajr: 'الفجر', dhuhr: 'الظهر', asr: 'العصر', maghrib: 'المغرب', isha: 'العشاء' };
+        const bankInfo = { bm: { name: 'بنك مصر', curr: 'EGP' }, tinkoff: { name: 'بنك تينكوف', curr: 'RUB' }, ozon: { name: 'بنك أوزون', curr: 'RUB' } };
+
+        // تحميل البيانات من Firebase
+        if (db) {
+            db.ref('app_data').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    if (data.balances) appState.balances = data.balances;
+                    if (data.transactions) appState.transactions = data.transactions;
+                    if (data.dailyPrayers) appState.dailyPrayers = data.dailyPrayers;
+                    if (data.missedPrayers) appState.missedPrayers = data.missedPrayers;
+                    if (data.lastDay) appState.lastDay = data.lastDay;
+                }
+                if (!document.getElementById('main-app').classList.contains('hidden')) {
+                    updateUI();
+                }
+            });
+        }
+
+        function saveData() {
+            if (db) {
+                db.ref('app_data').set(appState);
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const inputPass = document.getElementById('login-password').value;
+            if (inputPass === PASSWORD) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                document.getElementById('login-error').classList.add('hidden');
+                document.body.classList.remove('flex', 'items-center', 'justify-center');
+                updateUI();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('login-password').value = '';
+            document.body.classList.add('flex', 'items-center', 'justify-center');
+        }
+
+        function checkNewDay() {
+            const todayStr = new Date().toLocaleDateString('ar-EG');
+            if (appState.lastDay !== todayStr) {
+                appState.dailyPrayers = { fajr: -1, dhuhr: -1, asr: -1, maghrib: -1, isha: -1 };
+                appState.lastDay = todayStr;
+                saveData();
+            }
+            document.getElementById('today-date-display').innerText = todayStr;
+        }
+
+        function switchTab(tab) {
+            document.getElementById('section-money').classList.toggle('hidden', tab !== 'money');
+            document.getElementById('section-prayers').classList.toggle('hidden', tab !== 'prayers');
+            document.getElementById('btn-money').className = tab === 'money' ? "px-5 py-2.5 rounded-xl font-bold text-sm bg-blue-600 text-white shadow-sm" : "px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-100 text-gray-700 hover:bg-gray-200";
+            document.getElementById('btn-prayers').className = tab === 'prayers' ? "px-5 py-2.5 rounded-xl font-bold text-sm bg-blue-600 text-white shadow-sm" : "px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-100 text-gray-700 hover:bg-gray-200";
+        }
+
+        function updateUI() {
+            checkNewDay();
+
+            // أرصدة البنوك
+            document.getElementById('bm-balance').innerText = appState.balances.bm.toLocaleString() + ' EGP';
+            document.getElementById('tinkoff-balance').innerText = appState.balances.tinkoff.toLocaleString() + ' RUB';
+            document.getElementById('ozon-balance').innerText = appState.balances.ozon.toLocaleString() + ' RUB';
+
+            // مؤشر اليوم
+            const todayStr = new Date().toLocaleDateString('ar-EG');
+            let todayInc = 0, todayExp = 0;
+            const tBody = document.getElementById('trans-table');
+            tBody.innerHTML = '';
+
+            appState.transactions.forEach((item, idx) => {
+                if (item.date === todayStr) {
+                    if (item.type === 'income') todayInc += item.amount;
+                    if (item.type === 'expense') todayExp += item.amount;
+                }
+
+                const isInc = item.type === 'income';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-2.5 font-bold ${isInc ? 'text-green-600' : 'text-red-600'}">${isInc ? '🟢 إضافة' : '🔻 مصروف'}</td>
+                    <td class="py-2.5 font-medium text-gray-800">${item.desc}</td>
+                    <td class="py-2.5 font-bold ${isInc ? 'text-green-600' : 'text-red-600'}">${isInc ? '+' : '-'}${item.amount} ${bankInfo[item.bank].curr}</td>
+                    <td class="py-2.5 text-gray-600">${bankInfo[item.bank].name}</td>
+                    <td class="py-2.5"><span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">${item.category || 'عام'}</span></td>
+                    <td class="py-2.5 text-xs text-gray-400">${item.date}</td>
+                    <td class="py-2.5 text-center"><button onclick="deleteTrans(${idx})" class="text-red-500 font-bold">✕</button></td>
+                `;
+                tBody.appendChild(tr);
+            });
+
+            document.getElementById('today-income').innerText = '+' + todayInc.toLocaleString();
+            document.getElementById('today-expense').innerText = '-' + todayExp.toLocaleString();
+            
+            const net = todayInc - todayExp;
+            const netEl = document.getElementById('today-net');
+            if(net >= 0) {
+                netEl.innerText = '+' + net.toLocaleString() + ' (ربح اليوم)';
+                netEl.className = 'text-xl font-black text-green-600 mt-1';
+            } else {
+                netEl.innerText = net.toLocaleString() + ' (خسارة اليوم)';
+                netEl.className = 'text-xl font-black text-red-600 mt-1';
+            }
+
+            // الصلوات اليومية
+            const dGrid = document.getElementById('daily-prayers-grid');
+            dGrid.innerHTML = '';
+            for(let k in appState.dailyPrayers) {
+                const isDone = (appState.dailyPrayers[k] === 0);
+                const card = document.createElement('div');
+                card.className = "p-3 rounded-xl border text-center cursor-pointer " + (isDone ? "bg-green-50 border-green-400 text-green-900" : "bg-red-50 border-red-200 text-red-900");
+                card.onclick = () => toggleDailyPrayer(k);
+                card.innerHTML = `
+                    <div class="font-bold text-sm">${prayerNames[k]}</div>
+                    <div class="text-2xl font-black ${isDone ? 'text-green-600' : 'text-red-600'}">${appState.dailyPrayers[k]}</div>
+                    <div class="text-[10px] px-2 py-0.5 rounded-full ${isDone ? 'bg-green-200 text-green-800 font-bold' : 'bg-red-200 text-red-800'}">${isDone ? 'تمت ✓' : 'لم تُصَلَّ (-1)'}</div>
+                `;
+                dGrid.appendChild(card);
+            }
+
+            // الصلوات الفائتة
+            const mList = document.getElementById('missed-prayers-list');
+            mList.innerHTML = '';
+            let totalM = 0;
+            for(let k in appState.missedPrayers) {
+                totalM += appState.missedPrayers[k];
+                const row = document.createElement('div');
+                row.className = "flex justify-between items-center py-2 px-1";
+                row.innerHTML = `
+                    <span class="text-lg font-bold text-white">${appState.missedPrayers[k].toLocaleString()}</span>
+                    <div class="flex items-center gap-3">
+                        <button onclick="prayMissed('${k}')" class="bg-emerald-600 text-white text-xs px-2.5 py-1 rounded-lg font-bold">قضيت صلاة ✓</button>
+                        <button onclick="editMissed('${k}')" class="bg-gray-800 text-gray-300 text-xs px-2 py-1 rounded-lg">تعديل</button>
+                        <span class="text-gray-300 font-bold text-base w-12 text-left">${prayerNames[k]}</span>
+                    </div>
+                `;
+                mList.appendChild(row);
+            }
+            document.getElementById('total-missed-display').innerText = totalM.toLocaleString();
+            document.getElementById('total-missed-summary').innerText = totalM.toLocaleString();
+        }
+
+        function addTransaction(e) {
+            e.preventDefault();
+            const pwd = prompt("أدخل كلمة السر لحفظ هذه العملية:");
+            if (pwd === PASSWORD) {
+                const type = document.getElementById('t-type').value;
+                const desc = document.getElementById('t-desc').value;
+                const amount = parseFloat(document.getElementById('t-amount').value);
+                const bank = document.getElementById('t-bank').value;
+                const category = document.getElementById('t-cat').value;
+
+                if (type === 'income') appState.balances[bank] += amount;
+                else appState.balances[bank] -= amount;
+
+                appState.transactions.unshift({ type, desc, amount, bank, category, date: new Date().toLocaleDateString('ar-EG') });
+                document.getElementById('trans-form').reset();
+                saveData();
+                updateUI();
+            } else if (pwd !== null) {
+                alert("كلمة السر غير صحيحة!");
+            }
+        }
+
+        function deleteTrans(idx) {
+            const pwd = prompt("أدخل كلمة السر لحذف هذه العملية:");
+            if (pwd === PASSWORD) {
+                const item = appState.transactions[idx];
+                if (item.type === 'income') appState.balances[item.bank] -= item.amount;
+                else appState.balances[item.bank] += item.amount;
+                appState.transactions.splice(idx, 1);
+                saveData();
+                updateUI();
+            } else if (pwd !== null) {
+                alert("كلمة السر غير صحيحة!");
+            }
+        }
+
+        function toggleDailyPrayer(k) {
+            if (appState.dailyPrayers[k] === -1) {
+                const pwd = prompt("أدخل كلمة السر لتأكيد صلاة (" + prayerNames[k] + "):");
+                if (pwd === PASSWORD) { 
+                    appState.dailyPrayers[k] = 0; 
+                    saveData();
+                    updateUI(); 
+                } else if (pwd !== null) {
+                    alert("كلمة السر غير صحيحة!");
+                }
+            } else {
+                const pwd = prompt("أدخل كلمة السر لإرجاع صلاة (" + prayerNames[k] + ") إلى (-1):");
+                if (pwd === PASSWORD) { 
+                    appState.dailyPrayers[k] = -1; 
+                    saveData();
+                    updateUI(); 
+                } else if (pwd !== null) {
+                    alert("كلمة السر غير صحيحة!");
+                }
+            }
+        }
+
+        function resetDailyPrayers() {
+            const pwd = prompt("أدخل كلمة السر لإعادة ضبط الصلوات اليومية بالكامل:");
+            if (pwd === PASSWORD) {
+                appState.dailyPrayers = { fajr: -1, dhuhr: -1, asr: -1, maghrib: -1, isha: -1 };
+                saveData();
+                updateUI();
+            } else if (pwd !== null) {
+                alert("كلمة السر غير صحيحة!");
+            }
+        }
+
+        function prayMissed(k) {
+            const pwd = prompt("أدخل كلمة السر لقضاء صلاة (" + prayerNames[k] + "):");
+            if (pwd === PASSWORD) {
+                if (appState.missedPrayers[k] < 0) { 
+                    appState.missedPrayers[k] += 1; 
+                    saveData();
+                    updateUI(); 
+                }
+            } else if (pwd !== null) {
+                alert("كلمة السر غير صحيحة!");
+            }
+        }
+
+        function editMissed(k) {
+            const pwd = prompt("أدخل كلمة السر لتعديل عدد صلاة (" + prayerNames[k] + "):");
+            if (pwd === PASSWORD) {
+                const val = prompt("أدخل العدد الجديد بالسالب (مثال: -2103):", appState.missedPrayers[k]);
+                if (val !== null && !isNaN(val)) {
+                    let n = parseInt(val);
+                    appState.missedPrayers[k] = n > 0 ? -n : n;
+                    saveData();
+                    updateUI();
+                }
+            } else if (pwd !== null) {
+                alert("كلمة السر غير صحيحة!");
+            }
+        }
+    </script>
+</body>
+</html>
