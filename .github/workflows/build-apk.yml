@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,12 +26,15 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Install & Sync Capacitor
+      - name: Install Dependencies
         run: |
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android
+
+      - name: Initialize Capacitor
+        run: |
           npx cap init "Abo Said" "com.abosaid.app" --web-dir .
-          npx cap add android || true
+          npx cap add android
           npx cap sync android
 
       - name: Build Android APK
