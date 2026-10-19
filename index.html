@@ -53,7 +53,7 @@
             <div class="text-center flex flex-col items-center">
                 <img src="ahmed logo.png" alt="Abo Said Logo" class="w-16 h-16 rounded-full object-cover border-2 border-blue-600 shadow-sm mb-2" onerror="this.src='https://via.placeholder.com/150'">
                 <h1 class="text-xl md:text-2xl font-black text-gray-800 mb-1">Welcome in Abo Said App</h1>
-                <p id="sync-status" class="text-xs text-emerald-600 font-bold mb-4">🟢 جاهز ومتصل بالخدمة</p>
+                <p id="sync-status" class="text-xs text-emerald-600 font-bold mb-4">🟢 متصل بالسحابة (Firebase)</p>
             </div>
             
             <div class="flex justify-center gap-2 border-t pt-4">
@@ -152,12 +152,12 @@
 
         <!-- ب) قسم الصلوات -->
         <div id="section-prayers" class="space-y-5 hidden">
-            <!-- الصلوات اليومية -->
+            <!-- الصلوات اليومية مرتبة بترتيب الأوقات -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
                 <div class="flex justify-between items-center border-b pb-3">
                     <div>
-                        <h2 class="text-base font-bold text-gray-800">🕌 الصلوات اليومية (اليوم)</h2>
-                        <p class="text-xs text-gray-500">تُرحَّل الصلوات غير المصلَّاة تلقائيًا للفائتة في منتصف الليل</p>
+                        <h2 class="text-base font-bold text-gray-800">🕌 الصلوات اليومية (ترتيب الأوقات)</h2>
+                        <p class="text-xs text-gray-500">الصلوات غير المصلّاة تتخصم وتزيد بالسالب في الفائتة بعد 12 منتصف الليل</p>
                     </div>
                     <button onclick="resetDailyPrayers()" class="text-xs text-red-500 hover:underline">إعادة ضبط (-1)</button>
                 </div>
@@ -166,15 +166,15 @@
 
             <!-- سجل أداء الصلوات الأيام السابقة -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-3">
-                <h3 class="text-base font-bold text-gray-800">📅 السجل اليومي للصلوات السابقة</h3>
-                <div id="prayer-history-list" class="space-y-2 max-h-60 overflow-y-auto pr-1 divide-y"></div>
+                <h3 class="text-base font-bold text-gray-800">📅 السجل التاريخي للصلوات السابقة</h3>
+                <div id="prayer-history-list" class="space-y-2 max-h-60 overflow-y-auto pr-1 divide-y divide-gray-100"></div>
             </div>
 
-            <!-- الصلوات الفائتة -->
+            <!-- الصلوات الفائتة مرتبة بترتيب الأوقات -->
             <div class="bg-black text-white p-6 rounded-3xl shadow-xl space-y-6">
                 <div class="text-center space-y-1">
                     <h2 class="text-xl font-black text-gray-100">جدول الصلوات الفائتة</h2>
-                    <p class="text-xs text-gray-400">تزيد تلقائيًا إذا لم تؤدِّ صلاة اليوم</p>
+                    <p class="text-xs text-gray-400">تزيد تلقائيًا في منتصف الليل إذا لم تؤدَّ صلاة اليوم</p>
                     <div class="pt-3">
                         <span class="text-3xl md:text-5xl font-black text-white" id="total-missed-display">-10,515</span>
                         <span class="text-sm font-bold text-gray-400 mr-2">صلاة</span>
@@ -215,26 +215,28 @@
             }
         } catch(e) { console.error("Firebase connection fallback"); }
 
+        // الترتيب الشرعي الصحيح للصلوات الخمس
+        const PRAYER_KEYS = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+        const prayerNames = { fajr: 'الفجر', dhuhr: 'الظهر', asr: 'العصر', maghrib: 'المغرب', isha: 'العشاء' };
+        const bankInfo = { bm: { name: 'بنك مصر', curr: 'EGP' }, tinkoff: { name: 'بنك تينكوف', curr: 'RUB' }, ozon: { name: 'بنك أوزون', curr: 'RUB' } };
+
         // حالة البيانات
         let appState = {
             balances: { bm: 0, tinkoff: 0, ozon: 0 },
             transactions: [],
             dailyPrayers: { fajr: -1, dhuhr: -1, asr: -1, maghrib: -1, isha: -1 },
             missedPrayers: { fajr: -2103, dhuhr: -2103, asr: -2103, maghrib: -2103, isha: -2103 },
-            prayerLogs: [], // سجل الصلوات اليومية السابق
+            prayerLogs: [], 
             lastDay: ''
         };
 
         try {
-            const saved = localStorage.getItem('abosaid_local_db_v14');
+            const saved = localStorage.getItem('abosaid_db_v15');
             if (saved) appState = JSON.parse(saved);
         } catch(e){}
 
-        const prayerNames = { fajr: 'الفجر', dhuhr: 'الظهر', asr: 'العصر', maghrib: 'المغرب', isha: 'العشاء' };
-        const bankInfo = { bm: { name: 'بنك مصر', curr: 'EGP' }, tinkoff: { name: 'بنك تينكوف', curr: 'RUB' }, ozon: { name: 'بنك أوزون', curr: 'RUB' } };
-
         if (db) {
-            db.ref('app_data_v14').on('value', (snapshot) => {
+            db.ref('app_data_v15').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     if (data.balances) appState.balances = data.balances;
@@ -252,13 +254,13 @@
         }
 
         function saveDataLocal() {
-            try { localStorage.setItem('abosaid_local_db_v14', JSON.stringify(appState)); } catch(e){}
+            try { localStorage.setItem('abosaid_db_v15', JSON.stringify(appState)); } catch(e){}
         }
 
         function saveData() {
             saveDataLocal();
             if (db) {
-                db.ref('app_data_v14').set(appState);
+                db.ref('app_data_v15').set(appState);
             }
         }
 
@@ -283,26 +285,25 @@
             document.body.classList.add('flex', 'items-center', 'justify-center');
         });
 
-        // التجديد التلقائي وحساب الصلوات الفائتة لليوم السابق
+        // التجديد التلقائي وتحويل الصلوات الفائتة
         function checkNewDay() {
             const todayStr = new Date().toLocaleDateString('ar-EG');
             if (appState.lastDay && appState.lastDay !== todayStr) {
-                // حفظ سجل اليوم السابق
-                const logEntry = {
+                // 1. تسجيل تاريخ اليوم السابق
+                if (!appState.prayerLogs) appState.prayerLogs = [];
+                appState.prayerLogs.unshift({
                     date: appState.lastDay,
                     prayers: { ...appState.dailyPrayers }
-                };
-                if (!appState.prayerLogs) appState.prayerLogs = [];
-                appState.prayerLogs.unshift(logEntry);
+                });
 
-                // خصم الصلوات التي لم تصَلَّ (-1) وتزويد الفائتة بالسالب
-                for (let key in appState.dailyPrayers) {
+                // 2. ترحيل أي صلاة (-1) إلى الفائتة بالسالب
+                PRAYER_KEYS.forEach(key => {
                     if (appState.dailyPrayers[key] === -1) {
-                        appState.missedPrayers[key] -= 1; // زيادة الفائتة
+                        appState.missedPrayers[key] -= 1;
                     }
-                }
+                });
 
-                // صفر اليوم الجديد
+                // 3. إعادة الضبط لليوم الجديد
                 appState.dailyPrayers = { fajr: -1, dhuhr: -1, asr: -1, maghrib: -1, isha: -1 };
                 appState.lastDay = todayStr;
                 saveData();
@@ -367,10 +368,10 @@
                 netEl.className = 'text-xl font-black text-red-600 mt-1';
             }
 
-            // الصلوات اليومية
+            // 1. الصلوات اليومية بترتيب الأوقات الصحيح (الفجر -> العشاء)
             const dGrid = document.getElementById('daily-prayers-grid');
             dGrid.innerHTML = '';
-            for(let k in appState.dailyPrayers) {
+            PRAYER_KEYS.forEach(k => {
                 const isDone = (appState.dailyPrayers[k] === 0);
                 const card = document.createElement('div');
                 card.className = "p-3 rounded-xl border text-center cursor-pointer " + (isDone ? "bg-green-50 border-green-400 text-green-900" : "bg-red-50 border-red-200 text-red-900");
@@ -381,9 +382,9 @@
                     <div class="text-[10px] px-2 py-0.5 rounded-full ${isDone ? 'bg-green-200 text-green-800 font-bold' : 'bg-red-200 text-red-800'}">${isDone ? 'تمت ✓' : 'لم تُصَلَّ (-1)'}</div>
                 `;
                 dGrid.appendChild(card);
-            }
+            });
 
-            // عرض سجل الصلوات التاريخية
+            // 2. عرض سجل أداء الصلوات التاريخي
             const pHistoryContainer = document.getElementById('prayer-history-list');
             pHistoryContainer.innerHTML = '';
             if (appState.prayerLogs && appState.prayerLogs.length > 0) {
@@ -392,23 +393,23 @@
                     row.className = "pt-2 flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs gap-1";
                     
                     let badges = '';
-                    for (let pKey in log.prayers) {
+                    PRAYER_KEYS.forEach(pKey => {
                         const done = log.prayers[pKey] === 0;
-                        badges += `<span class="px-2 py-0.5 rounded ${done ? 'bg-green-100 text-green-700 font-bold' : 'bg-red-100 text-red-600'}">${prayerNames[pKey]}: ${done ? '✓' : '✗'}</span> `;
-                    }
+                        badges += `<span class="px-2 py-0.5 rounded ${done ? 'bg-green-100 text-green-700 font-bold' : 'bg-red-100 text-red-600'}">${prayerNames[pKey]}: ${done ? '✓' : 'x'}</span> `;
+                    });
 
-                    row.innerHTML = `<span class="font-bold text-gray-500 min-w-24">${log.date}</span><div class="flex flex-wrap gap-1">${badges}</div>`;
+                    row.innerHTML = `<span class="font-bold text-gray-600 min-w-24">${log.date}</span><div class="flex flex-wrap gap-1">${badges}</div>`;
                     pHistoryContainer.appendChild(row);
                 });
             } else {
-                pHistoryContainer.innerHTML = `<p class="text-xs text-gray-400 text-center py-2">لا توجد سجلات أيام سابقة بعد.</p>`;
+                pHistoryContainer.innerHTML = `<p class="text-xs text-gray-400 text-center py-2">سجل الأيام السابقة سيظهر هنا تلقائياً ابتداءً من الغد.</p>`;
             }
 
-            // الصلوات الفائتة
+            // 3. الصلوات الفائتة بترتيب الأوقات الصحيح
             const mList = document.getElementById('missed-prayers-list');
             mList.innerHTML = '';
             let totalM = 0;
-            for(let k in appState.missedPrayers) {
+            PRAYER_KEYS.forEach(k => {
                 totalM += appState.missedPrayers[k];
                 const row = document.createElement('div');
                 row.className = "flex justify-between items-center py-2 px-1";
@@ -421,7 +422,7 @@
                     </div>
                 `;
                 mList.appendChild(row);
-            }
+            });
             document.getElementById('total-missed-display').innerText = totalM.toLocaleString();
             document.getElementById('total-missed-summary').innerText = totalM.toLocaleString();
         }
