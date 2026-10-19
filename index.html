@@ -80,14 +80,17 @@
                 </div>
                 
                 <div class="flex flex-wrap justify-center gap-2 border-t border-gray-100 dark:border-gray-700 pt-4">
-                    <button id="btn-money" onclick="switchTab('money')" class="px-4 py-2 rounded-xl font-bold text-xs md:text-sm bg-blue-600 text-white shadow-sm">
+                    <button id="btn-money" onclick="switchTab('money')" class="px-3.5 py-2 rounded-xl font-bold text-xs md:text-sm bg-blue-600 text-white shadow-sm">
                         💵 إدارة الأموال
                     </button>
-                    <button id="btn-prayers" onclick="switchTab('prayers')" class="px-4 py-2 rounded-xl font-bold text-xs md:text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+                    <button id="btn-prayers" onclick="switchTab('prayers')" class="px-3.5 py-2 rounded-xl font-bold text-xs md:text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
                         🕌 جدول الصلوات
                     </button>
-                    <button id="btn-debts" onclick="switchTab('debts')" class="px-4 py-2 rounded-xl font-bold text-xs md:text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+                    <button id="btn-debts" onclick="switchTab('debts')" class="px-3.5 py-2 rounded-xl font-bold text-xs md:text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
                         🤝 الديون والجمعيات
+                    </button>
+                    <button id="btn-docs" onclick="switchTab('docs')" class="px-3.5 py-2 rounded-xl font-bold text-xs md:text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+                        📁 الأرشيف والمستندات
                     </button>
                 </div>
             </div>
@@ -208,9 +211,8 @@
                 </div>
             </div>
 
-            <!-- ج) قسم الديون والجمعيات (الجديد 🔥) -->
+            <!-- ج) قسم الديون والجمعيات -->
             <div id="section-debts" class="space-y-5 hidden">
-                <!-- كروت الإحصائيات السريعة للديون -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div class="bg-emerald-600 text-white p-4 rounded-2xl shadow-sm">
                         <div class="text-xs opacity-90 font-bold">إجمالي فلوس ليَّ عند الناس 🟢</div>
@@ -222,7 +224,6 @@
                     </div>
                 </div>
 
-                <!-- إضافة دين جديد -->
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors space-y-3">
                     <h3 class="text-base font-bold text-gray-800 dark:text-white">تسجيل معاملة / دين جديد</h3>
                     <form id="debt-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
@@ -241,7 +242,6 @@
                     </form>
                 </div>
 
-                <!-- جدول الديون -->
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors space-y-3">
                     <h3 class="text-base font-bold text-gray-800 dark:text-white">سجل الديون والالتزامات</h3>
                     <div class="overflow-x-auto">
@@ -260,7 +260,6 @@
                     </div>
                 </div>
 
-                <!-- قسم الجمعيات المالية -->
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors space-y-4">
                     <h3 class="text-base font-bold text-gray-800 dark:text-white">🏦 متابع الجمعيات المالية</h3>
                     <form id="assoc-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
@@ -272,6 +271,35 @@
                     </form>
 
                     <div id="assoc-list" class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2"></div>
+                </div>
+            </div>
+
+            <!-- د) قسم الأرشيف والمستندات (الجديد مع رفع وتنزيل الملفات 🔥) -->
+            <div id="section-docs" class="space-y-5 hidden">
+                <!-- رفع مستند جديد -->
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors space-y-3">
+                    <h3 class="text-base font-bold text-gray-800 dark:text-white">📁 حفظ وتخزين مستند جديد</h3>
+                    <form id="doc-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <input type="text" id="doc-title" placeholder="اسم المستند (مثال: جواز السفر)" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
+                        <input type="text" id="doc-number" placeholder="رقم الوثيقة / الكارت" class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
+                        <input type="date" id="doc-expiry" class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
+                        
+                        <!-- اختيار ملف من الجهاز -->
+                        <div class="col-span-1 md:col-span-2 lg:col-span-3">
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-300 mb-1">اختر صورة المستند أو ملف PDF من جهازك:</label>
+                            <input type="file" id="doc-file" accept="image/*,.pdf" class="w-full text-xs text-gray-500 bg-gray-50 dark:bg-gray-700 p-2 border border-gray-200 dark:border-gray-600 rounded-xl">
+                        </div>
+
+                        <button type="submit" class="col-span-1 md:col-span-2 lg:col-span-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm shadow">
+                            حفظ المستند في الأرشيف 💾
+                        </button>
+                    </form>
+                </div>
+
+                <!-- قائمة المستندات المحفوظة -->
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors space-y-4">
+                    <h3 class="text-base font-bold text-gray-800 dark:text-white">📄 خزانة المستندات المحفوظة</h3>
+                    <div id="docs-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
             </div>
 
@@ -344,16 +372,17 @@
             prayerLogs: [], 
             debts: [],
             associations: [],
+            documents: [],
             lastDay: ''
         };
 
         try {
-            const saved = localStorage.getItem('abosaid_db_v24');
+            const saved = localStorage.getItem('abosaid_db_v25');
             if (saved) appState = JSON.parse(saved);
         } catch(e){}
 
         if (db) {
-            db.ref('app_data_v24').on('value', (snapshot) => {
+            db.ref('app_data_v25').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     if (data.balances) appState.balances = data.balances;
@@ -363,6 +392,7 @@
                     if (data.prayerLogs) appState.prayerLogs = data.prayerLogs;
                     if (data.debts) appState.debts = data.debts;
                     if (data.associations) appState.associations = data.associations;
+                    if (data.documents) appState.documents = data.documents;
                     if (data.lastDay) appState.lastDay = data.lastDay;
                     saveDataLocal();
                 }
@@ -373,12 +403,12 @@
         }
 
         function saveDataLocal() {
-            try { localStorage.setItem('abosaid_db_v24', JSON.stringify(appState)); } catch(e){}
+            try { localStorage.setItem('abosaid_db_v25', JSON.stringify(appState)); } catch(e){}
         }
 
         function saveData() {
             saveDataLocal();
-            if (db) db.ref('app_data_v24').set(appState);
+            if (db) db.ref('app_data_v25').set(appState);
         }
 
         document.getElementById('login-form').addEventListener('submit', function(e) {
@@ -423,13 +453,15 @@
             document.getElementById('section-money').classList.toggle('hidden', tab !== 'money');
             document.getElementById('section-prayers').classList.toggle('hidden', tab !== 'prayers');
             document.getElementById('section-debts').classList.toggle('hidden', tab !== 'debts');
+            document.getElementById('section-docs').classList.toggle('hidden', tab !== 'docs');
 
-            const activeClass = "px-4 py-2 rounded-xl font-bold text-xs md:text-sm bg-blue-600 text-white shadow-sm";
-            const inactiveClass = "px-4 py-2 rounded-xl font-bold text-xs md:text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200";
+            const activeClass = "px-3.5 py-2 rounded-xl font-bold text-xs md:text-sm bg-blue-600 text-white shadow-sm";
+            const inactiveClass = "px-3.5 py-2 rounded-xl font-bold text-xs md:text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200";
 
             document.getElementById('btn-money').className = tab === 'money' ? activeClass : inactiveClass;
             document.getElementById('btn-prayers').className = tab === 'prayers' ? activeClass : inactiveClass;
             document.getElementById('btn-debts').className = tab === 'debts' ? activeClass : inactiveClass;
+            document.getElementById('btn-docs').className = tab === 'docs' ? activeClass : inactiveClass;
         }
 
         function updateUI() {
@@ -507,7 +539,7 @@
             document.getElementById('total-missed-display').innerText = totalM.toLocaleString();
             document.getElementById('total-missed-summary').innerText = totalM.toLocaleString();
 
-            // الديون والجمعيات
+            // الديون
             let recEgp = 0, recRub = 0, payEgp = 0, payRub = 0;
             const debtsTbody = document.getElementById('debts-table');
             debtsTbody.innerHTML = '';
@@ -538,7 +570,7 @@
             document.getElementById('total-receivable').innerText = `${recEgp.toLocaleString()} EGP / ${recRub.toLocaleString()} RUB`;
             document.getElementById('total-payable').innerText = `${payEgp.toLocaleString()} EGP / ${payRub.toLocaleString()} RUB`;
 
-            // قائمة الجمعيات
+            // الجمعيات
             const assocContainer = document.getElementById('assoc-list');
             assocContainer.innerHTML = '';
             (appState.associations || []).forEach((a, idx) => {
@@ -554,9 +586,81 @@
                 `;
                 assocContainer.appendChild(card);
             });
+
+            // قسم المستندات والملفات المحفوظة
+            const docsContainer = document.getElementById('docs-grid');
+            docsContainer.innerHTML = '';
+            (appState.documents || []).forEach((doc, idx) => {
+                const card = document.createElement('div');
+                card.className = "p-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 space-y-3 relative";
+                
+                let filePreview = '';
+                if(doc.fileData) {
+                    if(doc.fileType && doc.fileType.includes('image')) {
+                        filePreview = `<img src="${doc.fileData}" class="w-full h-32 object-cover rounded-xl border border-gray-200 mb-2">`;
+                    } else {
+                        filePreview = `<div class="p-3 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded-xl text-center text-xs font-bold mb-2">📄 ملف PDF محفوظ</div>`;
+                    }
+                }
+
+                card.innerHTML = `
+                    <button onclick="deleteDoc(${idx})" class="absolute top-3 left-3 text-red-500 font-bold text-xs bg-red-100 dark:bg-red-950 px-2 py-1 rounded-lg">حذف ✕</button>
+                    ${filePreview}
+                    <div>
+                        <div class="font-black text-base text-gray-800 dark:text-white">${doc.title}</div>
+                        ${doc.number ? `<div class="text-xs text-gray-500 dark:text-gray-300 mt-0.5">رقم الوثيقة: <b>${doc.number}</b></div>` : ''}
+                        ${doc.expiry ? `<div class="text-xs text-blue-600 dark:text-blue-400 font-bold mt-0.5">تاريخ الانتهاء: ${doc.expiry}</div>` : ''}
+                    </div>
+                    ${doc.fileData ? `
+                        <div class="flex gap-2 border-t border-gray-200 dark:border-gray-600 pt-3">
+                            <a href="${doc.fileData}" target="_blank" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-1.5 rounded-lg text-xs font-bold">معاينة 👁️</a>
+                            <a href="${doc.fileData}" download="${doc.title}" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-center py-1.5 rounded-lg text-xs font-bold">تنزيل 📥</a>
+                        </div>
+                    ` : ''}
+                `;
+                docsContainer.appendChild(card);
+            });
         }
 
-        // تسجيل عملية مالية
+        // حفظ المستند مع رفع الملف
+        document.getElementById('doc-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (prompt("أدخل كلمة السر لحفظ المستند:") === PASSWORD) {
+                const title = document.getElementById('doc-title').value;
+                const number = document.getElementById('doc-number').value;
+                const expiry = document.getElementById('doc-expiry').value;
+                const fileInput = document.getElementById('doc-file');
+
+                const processAndSave = (fileData, fileType) => {
+                    if (!appState.documents) appState.documents = [];
+                    appState.documents.unshift({ title, number, expiry, fileData, fileType });
+                    document.getElementById('doc-form').reset();
+                    saveData();
+                    updateUI();
+                };
+
+                if (fileInput.files && fileInput.files[0]) {
+                    const file = fileInput.files[0];
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        processAndSave(evt.target.result, file.type);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    processAndSave('', '');
+                }
+            } else alert("كلمة السر غير صحيحة!");
+        });
+
+        function deleteDoc(idx) {
+            if (prompt("أدخل كلمة السر لحذف المستند:") === PASSWORD) {
+                appState.documents.splice(idx, 1);
+                saveData();
+                updateUI();
+            } else alert("كلمة السر غير صحيحة!");
+        }
+
+        // باقي العمليات والوظائف
         document.getElementById('trans-form').addEventListener('submit', function(e) {
             e.preventDefault();
             if (prompt("أدخل كلمة السر لحفظ العملية:") === PASSWORD) {
@@ -588,7 +692,6 @@
             } else alert("كلمة السر غير صحيحة!");
         }
 
-        // إضافة دين جديد
         document.getElementById('debt-form').addEventListener('submit', function(e) {
             e.preventDefault();
             if (prompt("أدخل كلمة السر لتسجيل الدين:") === PASSWORD) {
@@ -622,7 +725,6 @@
             window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // إضافة جمعية
         document.getElementById('assoc-form').addEventListener('submit', function(e) {
             e.preventDefault();
             if (prompt("أدخل كلمة السر لإضافة الجمعية:") === PASSWORD) {
