@@ -18,7 +18,7 @@
         
         <!-- اللوجو في صفحة تسجيل الدخول -->
         <div class="flex justify-center">
-            <img src="ahmed logo.jpg" alt="Ahmed Logo" class="w-full h-full object-cover">
+            <img src="ahmed logo.png" alt="Abo Said Logo" class="w-28 h-28 rounded-full object-cover border-4 border-blue-600 shadow-md">
         </div>
 
         <div>
@@ -49,8 +49,7 @@
             
             <div class="text-center flex flex-col items-center">
                 <!-- اللوجو داخل التطبيق -->
-                <img src="ahmed logo.jpg" alt="Ahmed Logo" class="w-full h-full object-cover">
-            
+                <img src="ahmed logo.png" alt="Abo Said Logo" class="w-16 h-16 rounded-full object-cover border-2 border-blue-600 shadow-sm mb-2">
                 <h1 class="text-xl md:text-2xl font-black text-gray-800 mb-1">Welcome in Abo Said App</h1>
                 <p class="text-xs text-gray-500 mb-4">إدارة الأموال والمصروفات & متابعة الصلوات | محمي بالكامل</p>
             </div>
@@ -198,10 +197,10 @@
 
         // تحميل البيانات من المتصفح
         try {
-            if(localStorage.getItem('b_data_v12')) balances = JSON.parse(localStorage.getItem('b_data_v12'));
-            if(localStorage.getItem('t_data_v12')) transactions = JSON.parse(localStorage.getItem('t_data_v12'));
-            if(localStorage.getItem('d_data_v12')) dailyPrayers = JSON.parse(localStorage.getItem('d_data_v12'));
-            if(localStorage.getItem('m_data_v12')) missedPrayers = JSON.parse(localStorage.getItem('m_data_v12'));
+            if(localStorage.getItem('b_data_v13')) balances = JSON.parse(localStorage.getItem('b_data_v13'));
+            if(localStorage.getItem('t_data_v13')) transactions = JSON.parse(localStorage.getItem('t_data_v13'));
+            if(localStorage.getItem('d_data_v13')) dailyPrayers = JSON.parse(localStorage.getItem('d_data_v13'));
+            if(localStorage.getItem('m_data_v13')) missedPrayers = JSON.parse(localStorage.getItem('m_data_v13'));
         } catch(e){}
 
         const prayerNames = { fajr: 'الفجر', dhuhr: 'الظهر', asr: 'العصر', maghrib: 'المغرب', isha: 'العشاء' };
@@ -232,21 +231,21 @@
 
         function saveData() {
             try {
-                localStorage.setItem('b_data_v12', JSON.stringify(balances));
-                localStorage.setItem('t_data_v12', JSON.stringify(transactions));
-                localStorage.setItem('d_data_v12', JSON.stringify(dailyPrayers));
-                localStorage.setItem('m_data_v12', JSON.stringify(missedPrayers));
+                localStorage.setItem('b_data_v13', JSON.stringify(balances));
+                localStorage.setItem('t_data_v13', JSON.stringify(transactions));
+                localStorage.setItem('d_data_v13', JSON.stringify(dailyPrayers));
+                localStorage.setItem('m_data_v13', JSON.stringify(missedPrayers));
             } catch(e){}
         }
 
         function checkNewDay() {
             const todayStr = new Date().toLocaleDateString('ar-EG');
             let lastDay = '';
-            try { lastDay = localStorage.getItem('last_day_v12'); } catch(e){}
+            try { lastDay = localStorage.getItem('last_day_v13'); } catch(e){}
             
             if (lastDay !== todayStr) {
                 dailyPrayers = { fajr: -1, dhuhr: -1, asr: -1, maghrib: -1, isha: -1 };
-                try { localStorage.setItem('last_day_v12', todayStr); } catch(e){}
+                try { localStorage.setItem('last_day_v13', todayStr); } catch(e){}
             }
             document.getElementById('today-date-display').innerText = todayStr;
         }
@@ -345,6 +344,7 @@
             saveData();
         }
 
+        // إضافة عملية بحماية كلمة السر
         function addTransaction(e) {
             e.preventDefault();
             const pwd = prompt("أدخل كلمة السر لحفظ هذه العملية:");
@@ -366,6 +366,7 @@
             }
         }
 
+        // حذف عملية بحماية كلمة السر
         function deleteTrans(idx) {
             const pwd = prompt("أدخل كلمة السر لحذف هذه العملية:");
             if (pwd === PASSWORD) {
@@ -379,6 +380,7 @@
             }
         }
 
+        // تأكيد صلاة يومية بحماية كلمة السر
         function toggleDailyPrayer(k) {
             if (dailyPrayers[k] === -1) {
                 const pwd = prompt("أدخل كلمة السر لتأكيد صلاة (" + prayerNames[k] + "):");
@@ -409,6 +411,7 @@
             }
         }
 
+        // صلاة فائتة بحماية كلمة السر
         function prayMissed(k) {
             const pwd = prompt("أدخل كلمة السر لقضاء صلاة (" + prayerNames[k] + "):");
             if (pwd === PASSWORD) {
@@ -421,6 +424,7 @@
             }
         }
 
+        // تعديل عدد الصلوات الفائتة بحماية كلمة السر
         function editMissed(k) {
             const pwd = prompt("أدخل كلمة السر لتعديل عدد صلاة (" + prayerNames[k] + "):");
             if (pwd === PASSWORD) {
