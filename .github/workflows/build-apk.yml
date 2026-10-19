@@ -28,17 +28,19 @@ jobs:
 
       - name: Clean & Prepare Web Directory
         run: |
-          rm -rf android www package*.json capacitor.config.*
-          mkdir -p www resources
-          cp -r index.html manifest.json my-logo.png www/ 2>/dev/null || true
-          cp my-logo.png resources/icon.png 2>/dev/null || true
-          cp my-logo.png resources/splash.png 2>/dev/null || true
+          rm -rf android www package*.json capacitor.config.* assets
+          mkdir -p www assets
+          cp -r index.html manifest.json "ahmed logo.png" www/ 2>/dev/null || true
+          cp "ahmed logo.png" assets/icon-only.png 2>/dev/null || true
+          cp "ahmed logo.png" assets/icon-foreground.png 2>/dev/null || true
+          cp "ahmed logo.png" assets/icon-background.png 2>/dev/null || true
+          cp "ahmed logo.png" assets/splash.png 2>/dev/null || true
 
-      - name: Install Capacitor & Res Tool
+      - name: Install Capacitor & Assets Tool
         run: |
           npm init -y
           npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
-          npm install -g cordova-res
+          npm install -g @capacitor/assets
 
       - name: Initialize & Sync Capacitor
         run: |
@@ -48,7 +50,7 @@ jobs:
 
       - name: Generate App Icon & Splash
         run: |
-          cordova-res android --skip-config --copy
+          npx capacitor-assets generate --android
 
       - name: Build Android APK
         run: |
