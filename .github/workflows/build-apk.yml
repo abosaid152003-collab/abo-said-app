@@ -26,15 +26,21 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Prepare Web Directory
+        run: |
+          mkdir -p www
+          cp -r index.html manifest.json ahmed\ logo.png www/ 2>/dev/null || true
+
       - name: Install Dependencies
         run: |
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android
 
-      - name: Initialize Capacitor
+      - name: Initialize & Sync Capacitor
         run: |
-          npx cap init "Abo Said" "com.abosaid.app" --web-dir .
+          npx cap init "Abo Said" "com.abosaid.app" --web-dir www
           npx cap add android
+          npx cap copy android
           npx cap sync android
 
       - name: Build Android APK
