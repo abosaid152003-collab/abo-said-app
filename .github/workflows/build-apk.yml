@@ -47,7 +47,7 @@ jobs:
 
       - name: Generate App Icon
         run: |
-          cordova-res android --skip-config --copy
+          cordova-res android --icon --skip-config --copy
 
       - name: Build Android APK
         run: |
