@@ -16,21 +16,22 @@
         body { font-family: 'Cairo', sans-serif; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-3 md:p-6 flex items-center justify-center">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-3 md:p-6">
 
-    <!-- ================= 0. شاشة الترحيب (بدون صورة، عد تنازلي فقط) ================= -->
-    <div id="welcome-screen" class="fixed inset-0 bg-blue-900 z-50 flex flex-col items-center justify-center text-white space-y-6 transition-opacity duration-700">
+    <!-- ================= 0. شاشة الترحيب الواضحة بالعد التنازلي ================= -->
+    <div id="welcome-screen" class="fixed inset-0 bg-blue-950 z-50 flex flex-col items-center justify-center text-white space-y-8 p-4 transition-opacity duration-700">
         <div class="text-center space-y-3">
-            <h1 class="text-3xl md:text-5xl font-black">أهلاً بك يا أبو سعيد</h1>
-            <p class="text-sm text-blue-200">جارٍ تجهيز التطبيق...</p>
+            <h1 class="text-3xl md:text-5xl font-black tracking-wide text-white">أهلاً بك يا أبو سعيد</h1>
+            <p class="text-base text-blue-200">جاري تحميل وتحديث البيانات...</p>
         </div>
-        <!-- دائرة العد التنازلي -->
-        <div class="w-20 h-20 rounded-full bg-blue-800 border-4 border-blue-400 flex items-center justify-center shadow-xl">
-            <span id="countdown-number" class="text-3xl font-black">5</span>
+        
+        <!-- دائرة العد التنازلي الواضحة من 5 إلى 1 -->
+        <div class="w-24 h-24 rounded-full bg-blue-800 border-4 border-blue-400 flex items-center justify-center shadow-2xl">
+            <span id="countdown-number" class="text-4xl font-black text-white">5</span>
         </div>
     </div>
 
-    <!-- ================= 1. شاشة تسجيل الدخول (بالصورة) ================= -->
+    <!-- ================= 1. شاشة تسجيل الدخول ================= -->
     <div id="login-screen" class="w-full max-w-md bg-white p-8 rounded-3xl shadow-lg border border-gray-100 text-center space-y-6 hidden">
         <div class="flex justify-center">
             <img src="ahmed logo.png" alt="Abo Said Logo" class="w-28 h-28 rounded-full object-cover border-4 border-blue-600 shadow-md" onerror="this.src='https://via.placeholder.com/150'">
@@ -53,7 +54,7 @@
         </form>
     </div>
 
-    <!-- ================= 2. شاشة التطبيق الرئيسية (بالصورة في الهيدر) ================= -->
+    <!-- ================= 2. شاشة التطبيق الرئيسية ================= -->
     <div id="main-app" class="w-full max-w-4xl mx-auto space-y-5 hidden">
         
         <!-- الهيدر والتنقل وتسجيل الخروج -->
@@ -209,7 +210,7 @@
 
     <!-- JavaScript -->
     <script>
-        // تشغيل العد التنازلي للترحيب (من 5 إلى 1)
+        // تشغيل عداد الترحيب (من 5 إلى 1)
         let countdown = 5;
         const countEl = document.getElementById('countdown-number');
         const welcomeScreen = document.getElementById('welcome-screen');
@@ -264,12 +265,12 @@
         };
 
         try {
-            const saved = localStorage.getItem('abosaid_db_v19');
+            const saved = localStorage.getItem('abosaid_db_v20');
             if (saved) appState = JSON.parse(saved);
         } catch(e){}
 
         if (db) {
-            db.ref('app_data_v19').on('value', (snapshot) => {
+            db.ref('app_data_v20').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     if (data.balances) appState.balances = data.balances;
@@ -287,13 +288,13 @@
         }
 
         function saveDataLocal() {
-            try { localStorage.setItem('abosaid_db_v19', JSON.stringify(appState)); } catch(e){}
+            try { localStorage.setItem('abosaid_db_v20', JSON.stringify(appState)); } catch(e){}
         }
 
         function saveData() {
             saveDataLocal();
             if (db) {
-                db.ref('app_data_v19').set(appState);
+                db.ref('app_data_v20').set(appState);
             }
         }
 
