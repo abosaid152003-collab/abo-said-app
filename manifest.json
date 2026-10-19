@@ -1,9 +1,9 @@
 {
-  "name": "Abo Said App",
-  "short_name": "AboSaid",
+  "name": "أهلاً بك يا أبو سعيد",
+  "short_name": "أبو سعيد",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f3f4f6",
+  "background_color": "#0f172a",
   "theme_color": "#2563eb",
   "icons": [
     {
