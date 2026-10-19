@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Firebase SDK (Compat Version) -->
+    <!-- Firebase SDK Compat -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
@@ -29,7 +29,7 @@
             <p class="text-xs text-gray-500 mt-2">يرجى إدخال كلمة السر للمتابعة</p>
         </div>
 
-        <form onsubmit="handleLogin(event)" class="space-y-4">
+        <form id="login-form" class="space-y-4">
             <div>
                 <input type="password" id="login-password" placeholder="أدخل كلمة السر..." required 
                        class="w-full p-3 bg-gray-50 border rounded-2xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
@@ -46,14 +46,14 @@
         
         <!-- الهيدر والتنقل وتسجيل الخروج -->
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 relative">
-            <button onclick="logout()" class="absolute top-5 left-5 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold px-3 py-1.5 rounded-xl border border-red-200 transition">
+            <button id="logout-btn" class="absolute top-5 left-5 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold px-3 py-1.5 rounded-xl border border-red-200 transition">
                 تسجيل الخروج 🔒
             </button>
             
             <div class="text-center flex flex-col items-center">
                 <img src="ahmed logo.png" alt="Abo Said Logo" class="w-16 h-16 rounded-full object-cover border-2 border-blue-600 shadow-sm mb-2" onerror="this.src='https://via.placeholder.com/150'">
                 <h1 class="text-xl md:text-2xl font-black text-gray-800 mb-1">Welcome in Abo Said App</h1>
-                <p id="sync-status" class="text-xs text-emerald-600 font-bold mb-4">🟢 متصل بالسحابة (Firebase)</p>
+                <p id="sync-status" class="text-xs text-emerald-600 font-bold mb-4">🟢 جاهز ومتصل بالخدمة</p>
             </div>
             
             <div class="flex justify-center gap-2 border-t pt-4">
@@ -111,7 +111,7 @@
             <!-- تسجيل عملية جديدة -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                 <h3 class="text-base font-bold text-gray-800 mb-3">تسجيل عملية جديدة</h3>
-                <form id="trans-form" onsubmit="addTransaction(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
+                <form id="trans-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
                     <select id="t-type" class="p-2.5 bg-gray-50 border rounded-xl text-sm font-bold">
                         <option value="expense">🔻 مصروف / خسارة</option>
                         <option value="income">🟢 إضافة / أرباح</option>
@@ -188,6 +188,9 @@
 
     <!-- JavaScript -->
     <script>
+        const PASSWORD = "ahmed123";
+
+        // إعدادات Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAmbQaIWA0KLQGHD1aeTHfUcl4RIHtmQNY",
             authDomain: "abo-said-app-ee7fc.firebaseapp.com",
@@ -195,22 +198,18 @@
             projectId: "abo-said-app-ee7fc",
             storageBucket: "abo-said-app-ee7fc.firebasestorage.app",
             messagingSenderId: "661467346684",
-            appId: "1:661467346684:web:ab75192bc0b52910470979",
-            measurementId: "G-0F7WKZ4H8L"
+            appId: "1:661467346684:web:ab75192bc0b52910470979"
         };
 
-        // تهيئة Firebase
         let db = null;
         try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.database();
-        } catch(e) {
-            console.error("Firebase Init Error:", e);
-        }
+            if (typeof firebase !== 'undefined') {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+            }
+        } catch(e) { console.error("Firebase connection fallback"); }
 
-        const PASSWORD = "ahmed123";
-
-        // بيانات التطبيق الشاملة
+        // حالة البيانات
         let appState = {
             balances: { bm: 0, tinkoff: 0, ozon: 0 },
             transactions: [],
@@ -219,10 +218,16 @@
             lastDay: ''
         };
 
+        // استرجاع البيانات المحلية
+        try {
+            const saved = localStorage.getItem('abosaid_local_db');
+            if (saved) appState = JSON.parse(saved);
+        } catch(e){}
+
         const prayerNames = { fajr: 'الفجر', dhuhr: 'الظهر', asr: 'العصر', maghrib: 'المغرب', isha: 'العشاء' };
         const bankInfo = { bm: { name: 'بنك مصر', curr: 'EGP' }, tinkoff: { name: 'بنك تينكوف', curr: 'RUB' }, ozon: { name: 'بنك أوزون', curr: 'RUB' } };
 
-        // تحميل البيانات من Firebase
+        // الاستماع لـ Firebase عند التوفر
         if (db) {
             db.ref('app_data').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -232,6 +237,7 @@
                     if (data.dailyPrayers) appState.dailyPrayers = data.dailyPrayers;
                     if (data.missedPrayers) appState.missedPrayers = data.missedPrayers;
                     if (data.lastDay) appState.lastDay = data.lastDay;
+                    saveDataLocal();
                 }
                 if (!document.getElementById('main-app').classList.contains('hidden')) {
                     updateUI();
@@ -239,13 +245,19 @@
             });
         }
 
+        function saveDataLocal() {
+            try { localStorage.setItem('abosaid_local_db', JSON.stringify(appState)); } catch(e){}
+        }
+
         function saveData() {
+            saveDataLocal();
             if (db) {
                 db.ref('app_data').set(appState);
             }
         }
 
-        function handleLogin(e) {
+        // تسجيل الدخول بطريقة مضمونة المباشرة
+        document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const inputPass = document.getElementById('login-password').value;
             if (inputPass === PASSWORD) {
@@ -257,14 +269,14 @@
             } else {
                 document.getElementById('login-error').classList.remove('hidden');
             }
-        }
+        });
 
-        function logout() {
+        document.getElementById('logout-btn').addEventListener('click', function() {
             document.getElementById('main-app').classList.add('hidden');
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('login-password').value = '';
             document.body.classList.add('flex', 'items-center', 'justify-center');
-        }
+        });
 
         function checkNewDay() {
             const todayStr = new Date().toLocaleDateString('ar-EG');
@@ -368,7 +380,7 @@
             document.getElementById('total-missed-summary').innerText = totalM.toLocaleString();
         }
 
-        function addTransaction(e) {
+        document.getElementById('trans-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const pwd = prompt("أدخل كلمة السر لحفظ هذه العملية:");
             if (pwd === PASSWORD) {
@@ -388,7 +400,7 @@
             } else if (pwd !== null) {
                 alert("كلمة السر غير صحيحة!");
             }
-        }
+        });
 
         function deleteTrans(idx) {
             const pwd = prompt("أدخل كلمة السر لحذف هذه العملية:");
