@@ -1,11 +1,16 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome in Abo Said App</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Firebase SDK Compat -->
@@ -16,9 +21,9 @@
         body { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; }
     </style>
 </head>
-<body id="app-body" class="bg-gray-100 min-h-screen transition-colors duration-300">
+<body id="app-body" class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-300">
 
-    <!-- ================= 0. شاشة الترحيب (خلفية بيضاء وعدّاد أزرق) ================= -->
+    <!-- ================= 0. شاشة الترحيب (خلفية بيضاء، عداد أزرق، بدون تخطي) ================= -->
     <div id="welcome-screen" style="display: flex; position: fixed; inset: 0; background-color: #ffffff; z-index: 99999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;">
         <div style="margin-bottom: 30px;">
             <h1 style="font-size: 34px; font-weight: 900; margin-bottom: 10px; color: #1e3a8a;">أهلاً بك يا أبو سعيد</h1>
@@ -26,21 +31,19 @@
         </div>
         
         <!-- دائرة العد التنازلي باللون الأزرق -->
-        <div style="width: 100px; height: 100px; border-radius: 50%; background-color: #eff6ff; border: 4px solid #2563eb; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(37,99,235,0.15); margin-bottom: 20px;">
+        <div style="width: 100px; height: 100px; border-radius: 50%; background-color: #eff6ff; border: 4px solid #2563eb; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(37,99,235,0.15);">
             <span id="countdown-number" style="font-size: 48px; font-weight: 900; color: #2563eb;">5</span>
         </div>
-
-        <button onclick="skipWelcome()" style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; padding: 6px 16px; border-radius: 12px; font-size: 12px; font-weight: bold; cursor: pointer;">تخطي ⏩</button>
     </div>
 
-    <!-- ================= 1. شاشة تسجيل الدخول مع زر الوضع الليلي/النهار ================= -->
+    <!-- ================= 1. شاشة تسجيل الدخول مع زر الوضع الليلي/النهار الشغال ================= -->
     <div id="login-screen" style="display: none;" class="min-h-screen flex items-center justify-center p-4 relative">
-        <!-- زر الوضع الليلي / النهار -->
-        <button onclick="toggleDarkMode()" class="absolute top-5 left-5 p-2.5 rounded-full bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-yellow-400 transition">
+        <!-- زر التبديل الحقيقي بين الليلي والنهار -->
+        <button onclick="toggleDarkMode()" type="button" class="absolute top-5 left-5 p-3 rounded-2xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 text-xl transition hover:scale-105 active:scale-95">
             <span id="theme-icon">🌙</span>
         </button>
 
-        <div id="login-card" class="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 text-center space-y-6 transition-colors">
+        <div class="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 text-center space-y-6 transition-colors">
             <div class="flex justify-center">
                 <img src="ahmed logo.png" alt="Abo Said Logo" class="w-28 h-28 rounded-full object-cover border-4 border-blue-600 shadow-md" onerror="this.src='https://via.placeholder.com/150'">
             </div>
@@ -53,7 +56,7 @@
             <form id="login-form" class="space-y-4">
                 <div>
                     <input type="password" id="login-password" placeholder="أدخل كلمة السر..." required 
-                           class="w-full p-3 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border dark:border-gray-600 rounded-2xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                           class="w-full p-3 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-2xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
                 </div>
                 <p id="login-error" class="text-xs text-red-500 font-bold hidden">كلمة السر غير صحيحة!</p>
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-2xl shadow-md transition">
@@ -79,7 +82,7 @@
                     <p id="sync-status" class="text-xs text-emerald-600 font-bold mb-4">🟢 متصل بالسحابة (Firebase)</p>
                 </div>
                 
-                <div class="flex justify-center gap-2 border-t dark:border-gray-700 pt-4">
+                <div class="flex justify-center gap-2 border-t border-gray-100 dark:border-gray-700 pt-4">
                     <button id="btn-money" onclick="switchTab('money')" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-blue-600 text-white shadow-sm">
                         💵 إدارة الأموال
                     </button>
@@ -135,18 +138,18 @@
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
                     <h3 class="text-base font-bold text-gray-800 dark:text-white mb-3">تسجيل عملية جديدة</h3>
                     <form id="trans-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
-                        <select id="t-type" class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border dark:border-gray-600 rounded-xl text-sm font-bold">
+                        <select id="t-type" class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm font-bold">
                             <option value="expense">🔻 مصروف / خسارة</option>
                             <option value="income">🟢 إضافة / أرباح</option>
                         </select>
-                        <input type="text" id="t-desc" placeholder="وصف العملية" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border dark:border-gray-600 rounded-xl text-sm">
-                        <input type="number" step="0.01" id="t-amount" placeholder="المبلغ" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border dark:border-gray-600 rounded-xl text-sm">
-                        <select id="t-bank" class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border dark:border-gray-600 rounded-xl text-sm">
+                        <input type="text" id="t-desc" placeholder="وصف العملية" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
+                        <input type="number" step="0.01" id="t-amount" placeholder="المبلغ" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
+                        <select id="t-bank" class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
                             <option value="bm">بنك مصر (EGP)</option>
                             <option value="tinkoff">بنك تينكوف (RUB)</option>
                             <option value="ozon">بنك أوزون (RUB)</option>
                         </select>
-                        <input type="text" id="t-cat" placeholder="التصنيف" class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border dark:border-gray-600 rounded-xl text-sm">
+                        <input type="text" id="t-cat" placeholder="التصنيف" class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
                         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm">حفظ العملية</button>
                     </form>
                 </div>
@@ -157,7 +160,7 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-right border-collapse text-sm text-gray-800 dark:text-gray-200">
                             <thead>
-                                <tr class="border-b dark:border-gray-700 text-gray-400 text-xs">
+                                <tr class="border-b border-gray-200 dark:border-gray-700 text-gray-400 text-xs">
                                     <th class="pb-2">النوع</th>
                                     <th class="pb-2">الوصف</th>
                                     <th class="pb-2">المبلغ</th>
@@ -177,7 +180,7 @@
             <div id="section-prayers" class="space-y-5 hidden">
                 <!-- الصلوات اليومية -->
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4 transition-colors">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b dark:border-gray-700 pb-3 gap-2">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 dark:border-gray-700 pb-3 gap-2">
                         <div>
                             <div class="flex items-center gap-2">
                                 <h2 class="text-base font-bold text-gray-800 dark:text-white">🕌 الصلوات اليومية</h2>
@@ -221,43 +224,40 @@
 
     <!-- JavaScript -->
     <script>
-        // تبديل الوضع الليلي والنهار
+        // دالة تبديل الوضع الليلي/النهار المضمونة 100%
         function toggleDarkMode() {
-            const body = document.getElementById('app-body');
+            const html = document.documentElement;
             const icon = document.getElementById('theme-icon');
-            body.classList.toggle('dark');
-            if (body.classList.contains('dark')) {
-                icon.innerText = '☀️';
-                localStorage.setItem('theme', 'dark');
-            } else {
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
                 icon.innerText = '🌙';
-                localStorage.setItem('theme', 'light');
+                localStorage.setItem('app_theme', 'light');
+            } else {
+                html.classList.add('dark');
+                icon.innerText = '☀️';
+                localStorage.setItem('app_theme', 'dark');
             }
         }
 
-        // استرجاع الوضع المفضل عند التحميل
-        if (localStorage.getItem('theme') === 'dark') {
-            document.getElementById('app-body').classList.add('dark');
+        // تطبيق الثيم المحفوظ فوراً
+        if (localStorage.getItem('app_theme') === 'dark') {
+            document.documentElement.classList.add('dark');
             document.getElementById('theme-icon').innerText = '☀️';
         }
 
-        // دالة إنهاء الترحيب
-        function skipWelcome() {
-            if(window.timer) clearInterval(window.timer);
-            document.getElementById('welcome-screen').style.display = 'none';
-            document.getElementById('login-screen').style.display = 'flex';
-        }
-
-        // تشغيل عداد الترحيب (5 لـ 1)
+        // تشغيل عداد الترحيب (5 لـ 1 أوتوماتيك بدون زر تخطي)
         let countdown = 5;
         const countEl = document.getElementById('countdown-number');
         
-        window.timer = setInterval(() => {
+        const timer = setInterval(() => {
             countdown--;
             if (countdown > 0) {
                 countEl.innerText = countdown;
             } else {
-                skipWelcome();
+                clearInterval(timer);
+                document.getElementById('welcome-screen').style.display = 'none';
+                document.getElementById('login-screen').style.display = 'flex';
             }
         }, 1000);
 
@@ -296,12 +296,12 @@
         };
 
         try {
-            const saved = localStorage.getItem('abosaid_db_v22');
+            const saved = localStorage.getItem('abosaid_db_v23');
             if (saved) appState = JSON.parse(saved);
         } catch(e){}
 
         if (db) {
-            db.ref('app_data_v22').on('value', (snapshot) => {
+            db.ref('app_data_v23').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     if (data.balances) appState.balances = data.balances;
@@ -319,13 +319,13 @@
         }
 
         function saveDataLocal() {
-            try { localStorage.setItem('abosaid_db_v22', JSON.stringify(appState)); } catch(e){}
+            try { localStorage.setItem('abosaid_db_v23', JSON.stringify(appState)); } catch(e){}
         }
 
         function saveData() {
             saveDataLocal();
             if (db) {
-                db.ref('app_data_v22').set(appState);
+                db.ref('app_data_v23').set(appState);
             }
         }
 
