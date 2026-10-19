@@ -30,7 +30,7 @@ jobs:
         run: |
           rm -rf android www package*.json capacitor.config.*
           mkdir -p www
-          cp -r index.html manifest.json ahmed\ logo.png www/ 2>/dev/null || true
+          cp -r index.html manifest.json my-logo.png www/ 2>/dev/null || true
 
       - name: Install Capacitor
         run: |
