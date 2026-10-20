@@ -173,7 +173,7 @@
                 </div>
             </div>
 
-            <!-- ب) قسم الصلوات الكامل والشامل 🔥 -->
+            <!-- ب) قسم الصلوات الكامل -->
             <div id="section-prayers" class="space-y-5 hidden">
                 
                 <!-- 1. العد التنازلي التلقائي للصلاة القادمة -->
@@ -183,7 +183,7 @@
                     <div class="text-xs text-blue-100" id="next-prayer-time-desc">جاري جلب مواقيت الصلاة اليومية تلقائياً...</div>
                 </div>
 
-                <!-- 2. الصلوات اليومية -->
+                <!-- 2. الصلوات اليومية (محمية بكلمة السر 🔐) -->
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4 transition-colors">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 dark:border-gray-700 pb-3 gap-2">
                         <div>
@@ -191,7 +191,7 @@
                                 <h2 class="text-base font-bold text-gray-800 dark:text-white">🕌 الصلوات اليومية</h2>
                                 <span id="prayer-day-full-date" class="bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-xs font-bold px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-800"></span>
                             </div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">تُرحَّل الصلوات غير المصلَّاة تلقائيًا للفائتة في منتصف الليل وتتسجل في السجل</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">تعديل أي صلاة يتطلب كلمة السر (🔐)</p>
                         </div>
                         <button onclick="resetDailyPrayersWithAuth()" class="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded-lg border border-red-200 font-bold hover:bg-red-100">إعادة ضبط اليوم 🔐</button>
                     </div>
@@ -286,7 +286,7 @@
         </div>
     </div>
 
-    <!-- JavaScript المطور والمحمي 100% -->
+    <!-- JavaScript المطور مع طلب كلمة السر للصلوات اليومية -->
     <script>
         function toggleDarkMode() {
             const html = document.documentElement;
@@ -508,10 +508,13 @@
             }, 1000);
         }
 
-        function togglePrayer(key) {
-            appState.dailyPrayers[key] = appState.dailyPrayers[key] === 1 ? -1 : 1;
-            saveData();
-            renderPrayers();
+        // تغيير حالة صلاة اليوم بعد التأكد من كلمة السر 🔒
+        function togglePrayerWithAuth(key) {
+            if (checkAuth()) {
+                appState.dailyPrayers[key] = appState.dailyPrayers[key] === 1 ? -1 : 1;
+                saveData();
+                renderPrayers();
+            }
         }
 
         function resetDailyPrayersWithAuth() {
@@ -548,9 +551,11 @@
         }
 
         function decreaseMissed(key) {
-            appState.missedPrayers[key] += 1;
-            saveData();
-            renderPrayers();
+            if (checkAuth()) {
+                appState.missedPrayers[key] += 1;
+                saveData();
+                renderPrayers();
+            }
         }
 
         function renderPrayers() {
@@ -560,7 +565,7 @@
                 const done = appState.dailyPrayers[key] === 1;
                 const timeText = fetchedPrayerTimes ? fetchedPrayerTimes[key] : '';
                 grid.innerHTML += `
-                    <button onclick="togglePrayer('${key}')" class="p-3 rounded-2xl border text-center transition ${done ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600'}">
+                    <button onclick="togglePrayerWithAuth('${key}')" class="p-3 rounded-2xl border text-center transition ${done ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600'}">
                         <div class="text-xs font-bold">${prayerNames[key]} ${timeText ? '(' + timeText + ')' : ''}</div>
                         <div class="text-lg mt-1 font-black">${done ? '🟢 أُدِّيَت' : '🔴 معلقة'}</div>
                     </button>
