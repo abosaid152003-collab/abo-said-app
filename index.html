@@ -173,8 +173,17 @@
                 </div>
             </div>
 
-            <!-- ب) قسم الصلوات -->
+            <!-- ب) قسم الصلوات الكامل والشامل 🔥 -->
             <div id="section-prayers" class="space-y-5 hidden">
+                
+                <!-- 1. العد التنازلي التلقائي للصلاة القادمة -->
+                <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-5 rounded-3xl shadow-lg space-y-2 text-center">
+                    <div class="text-xs text-blue-200 font-bold">⏳ الوقت المتبقي على أذان <span id="next-prayer-name" class="text-yellow-300 font-black text-sm">...</span></div>
+                    <div class="text-3xl md:text-5xl font-black tracking-widest font-mono py-1 text-yellow-300" id="prayer-countdown">00:00:00</div>
+                    <div class="text-xs text-blue-100" id="next-prayer-time-desc">جاري جلب مواقيت الصلاة اليومية تلقائياً...</div>
+                </div>
+
+                <!-- 2. الصلوات اليومية -->
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4 transition-colors">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 dark:border-gray-700 pb-3 gap-2">
                         <div>
@@ -182,31 +191,36 @@
                                 <h2 class="text-base font-bold text-gray-800 dark:text-white">🕌 الصلوات اليومية</h2>
                                 <span id="prayer-day-full-date" class="bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-xs font-bold px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-800"></span>
                             </div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">تُرحَّل الصلوات غير المصلَّاة تلقائيًا للفائتة في منتصف الليل</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">تُرحَّل الصلوات غير المصلَّاة تلقائيًا للفائتة في منتصف الليل وتتسجل في السجل</p>
                         </div>
-                        <button onclick="resetDailyPrayers()" class="text-xs text-red-500 hover:underline">إعادة ضبط (-1)</button>
+                        <button onclick="resetDailyPrayersWithAuth()" class="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded-lg border border-red-200 font-bold hover:bg-red-100">إعادة ضبط اليوم 🔐</button>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3" id="daily-prayers-grid"></div>
                 </div>
 
+                <!-- 3. السجل التاريخي للصلوات السابقة -->
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-3 transition-colors">
                     <h3 class="text-base font-bold text-gray-800 dark:text-white">📅 السجل التاريخي للصلوات السابقة</h3>
                     <div id="prayer-history-list" class="space-y-2 max-h-60 overflow-y-auto pr-1 divide-y divide-gray-100 dark:divide-gray-700"></div>
                 </div>
 
+                <!-- 4. جدول الصلوات الفائتة وتعديل أعدادها بكلمة السر -->
                 <div class="bg-black text-white p-6 rounded-3xl shadow-xl space-y-6">
                     <div class="text-center space-y-1">
-                        <h2 class="text-xl font-black text-gray-100">جدول الصلوات الفائتة</h2>
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-xl font-black text-gray-100">جدول الصلوات الفائتة</h2>
+                            <button onclick="editAllMissedWithAuth()" class="text-xs bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-3 py-1 rounded-lg transition">تعديل الأعداد 🔐</button>
+                        </div>
                         <p class="text-xs text-gray-400">تزيد تلقائيًا في منتصف الليل إذا لم تؤدَّ صلاة اليوم</p>
                         <div class="pt-3">
-                            <span class="text-3xl md:text-5xl font-black text-white" id="total-missed-display">-10,515</span>
+                            <span class="text-3xl md:text-5xl font-black text-white" id="total-missed-display">0</span>
                             <span class="text-sm font-bold text-gray-400 mr-2">صلاة</span>
                         </div>
                     </div>
                     <div class="divide-y divide-gray-800 border-t border-b border-gray-800 py-2 space-y-2" id="missed-prayers-list"></div>
                     <div class="flex justify-between items-center pt-2">
                         <span class="text-gray-400 text-sm font-bold">الإجمالي الفائت</span>
-                        <span class="text-xl font-black text-red-500" id="total-missed-summary">-10,515</span>
+                        <span class="text-xl font-black text-red-500" id="total-missed-summary">0</span>
                     </div>
                 </div>
             </div>
@@ -259,42 +273,11 @@
                         </table>
                     </div>
                 </div>
-
-                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors space-y-4">
-                    <h3 class="text-base font-bold text-gray-800 dark:text-white">🏦 متابع الجمعيات المالية</h3>
-                    <form id="assoc-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                        <input type="text" id="a-name" placeholder="اسم الجمعية" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
-                        <input type="number" id="a-payout" placeholder="مبلغ القبض الكلي" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
-                        <input type="number" id="a-monthly" placeholder="القسط الشهري" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
-                        <input type="text" id="a-date" placeholder="تاريخ دورك في القبض" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
-                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm">إضافة جمعية</button>
-                    </form>
-
-                    <div id="assoc-list" class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2"></div>
-                </div>
             </div>
 
             <!-- د) قسم الأرشيف والمستندات -->
             <div id="section-docs" class="space-y-5 hidden">
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors space-y-3">
-                    <h3 class="text-base font-bold text-gray-800 dark:text-white">📁 حفظ وتخزين مستند جديد</h3>
-                    <form id="doc-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        <input type="text" id="doc-title" placeholder="اسم المستند (مثال: جواز السفر)" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
-                        <input type="text" id="doc-number" placeholder="رقم الوثيقة / الكارت" class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
-                        <input type="date" id="doc-expiry" class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
-                        
-                        <div class="col-span-1 md:col-span-2 lg:col-span-3">
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-300 mb-1">اختر صورة المستند أو ملف PDF من جهازك:</label>
-                            <input type="file" id="doc-file" accept="image/*,.pdf" class="w-full text-xs text-gray-500 bg-gray-50 dark:bg-gray-700 p-2 border border-gray-200 dark:border-gray-600 rounded-xl">
-                        </div>
-
-                        <button type="submit" class="col-span-1 md:col-span-2 lg:col-span-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm shadow">
-                            حفظ المستند في الأرشيف 💾
-                        </button>
-                    </form>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors space-y-4">
                     <h3 class="text-base font-bold text-gray-800 dark:text-white">📄 خزانة المستندات المحفوظة</h3>
                     <div id="docs-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
@@ -303,7 +286,7 @@
         </div>
     </div>
 
-    <!-- JavaScript الأصلي بالكامل دون أي تعديل -->
+    <!-- JavaScript المطور والمحمي 100% -->
     <script>
         function toggleDarkMode() {
             const html = document.documentElement;
@@ -359,7 +342,7 @@
 
         const PRAYER_KEYS = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
         const prayerNames = { fajr: 'الفجر', dhuhr: 'الظهر', asr: 'العصر', maghrib: 'المغرب', isha: 'العشاء' };
-        const bankInfo = { bm: { name: 'بنك مصر', curr: 'EGP' }, tinkoff: { name: 'بنك تينكوف', curr: 'RUB' }, ozon: { name: 'بنك أوزون', curr: 'RUB' } };
+        let fetchedPrayerTimes = null;
 
         let appState = {
             balances: { bm: 0, tinkoff: 0, ozon: 0 },
@@ -408,6 +391,13 @@
             if (db) db.ref('app_data_v25').set(appState);
         }
 
+        function checkAuth() {
+            const pwd = prompt("أدخل كلمة السر للتعديل:");
+            if (pwd === PASSWORD) return true;
+            alert("كلمة السر غير صحيحة!");
+            return false;
+        }
+
         document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault();
             if (document.getElementById('login-password').value === PASSWORD) {
@@ -415,6 +405,7 @@
                 document.getElementById('main-app').style.display = 'block';
                 document.getElementById('login-error').classList.add('hidden');
                 updateUI();
+                fetchDailyPrayerTimes();
             } else {
                 document.getElementById('login-error').classList.remove('hidden');
             }
@@ -461,16 +452,99 @@
             document.getElementById('btn-docs').className = tab === 'docs' ? activeClass : inactiveClass;
         }
 
+        async function fetchDailyPrayerTimes() {
+            try {
+                const res = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Cairo&country=Egypt&method=5');
+                const data = await res.json();
+                if (data && data.data && data.data.timings) {
+                    const t = data.data.timings;
+                    fetchedPrayerTimes = {
+                        fajr: t.Fajr,
+                        dhuhr: t.Dhuhr,
+                        asr: t.Asr,
+                        maghrib: t.Maghrib,
+                        isha: t.Isha
+                    };
+                    renderPrayers();
+                    startPrayerCountdown();
+                }
+            } catch (e) {}
+        }
+
+        function startPrayerCountdown() {
+            setInterval(() => {
+                if (!fetchedPrayerTimes) return;
+                const now = new Date();
+                let nextPrayer = null;
+                let minDiff = Infinity;
+
+                PRAYER_KEYS.forEach(key => {
+                    const [h, m] = fetchedPrayerTimes[key].split(':');
+                    const pDate = new Date();
+                    pDate.setHours(parseInt(h), parseInt(m), 0, 0);
+                    
+                    let diff = pDate - now;
+                    if (diff < 0) {
+                        pDate.setDate(pDate.getDate() + 1);
+                        diff = pDate - now;
+                    }
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        nextPrayer = { name: prayerNames[key], timeStr: fetchedPrayerTimes[key], diff };
+                    }
+                });
+
+                if (nextPrayer) {
+                    document.getElementById('next-prayer-name').innerText = nextPrayer.name;
+                    document.getElementById('next-prayer-time-desc').innerText = `موعد أذان ${nextPrayer.name}: ${nextPrayer.timeStr}`;
+                    
+                    const totalSec = Math.floor(nextPrayer.diff / 1000);
+                    const hours = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+                    const mins = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+                    const secs = String(totalSec % 60).padStart(2, '0');
+                    
+                    document.getElementById('prayer-countdown').innerText = `${hours}:${mins}:${secs}`;
+                }
+            }, 1000);
+        }
+
         function togglePrayer(key) {
             appState.dailyPrayers[key] = appState.dailyPrayers[key] === 1 ? -1 : 1;
             saveData();
             renderPrayers();
         }
 
-        function resetDailyPrayers() {
-            appState.dailyPrayers = { fajr: -1, dhuhr: -1, asr: -1, maghrib: -1, isha: -1 };
-            saveData();
-            renderPrayers();
+        function resetDailyPrayersWithAuth() {
+            if (checkAuth()) {
+                appState.dailyPrayers = { fajr: -1, dhuhr: -1, asr: -1, maghrib: -1, isha: -1 };
+                saveData();
+                renderPrayers();
+            }
+        }
+
+        function editMissedSingle(key) {
+            if (checkAuth()) {
+                const current = appState.missedPrayers[key] || 0;
+                const newVal = prompt(`أدخل العدد الجديد لصلوات ${prayerNames[key]} الفائتة:`, current);
+                if (newVal !== null && !isNaN(newVal)) {
+                    appState.missedPrayers[key] = parseInt(newVal);
+                    saveData();
+                    renderPrayers();
+                }
+            }
+        }
+
+        function editAllMissedWithAuth() {
+            if (checkAuth()) {
+                PRAYER_KEYS.forEach(key => {
+                    const val = prompt(`أدخل العدد الجديد لـ ${prayerNames[key]} الفائتة:`, appState.missedPrayers[key] || 0);
+                    if (val !== null && !isNaN(val)) {
+                        appState.missedPrayers[key] = parseInt(val);
+                    }
+                });
+                saveData();
+                renderPrayers();
+            }
         }
 
         function decreaseMissed(key) {
@@ -484,9 +558,10 @@
             grid.innerHTML = '';
             PRAYER_KEYS.forEach(key => {
                 const done = appState.dailyPrayers[key] === 1;
+                const timeText = fetchedPrayerTimes ? fetchedPrayerTimes[key] : '';
                 grid.innerHTML += `
                     <button onclick="togglePrayer('${key}')" class="p-3 rounded-2xl border text-center transition ${done ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600'}">
-                        <div class="text-xs font-bold">${prayerNames[key]}</div>
+                        <div class="text-xs font-bold">${prayerNames[key]} ${timeText ? '(' + timeText + ')' : ''}</div>
                         <div class="text-lg mt-1 font-black">${done ? '🟢 أُدِّيَت' : '🔴 معلقة'}</div>
                     </button>
                 `;
@@ -495,7 +570,7 @@
             const historyList = document.getElementById('prayer-history-list');
             historyList.innerHTML = '';
             if (!appState.prayerLogs || appState.prayerLogs.length === 0) {
-                historyList.innerHTML = '<p class="text-xs text-gray-400 py-2">لا يوجد سجلات سابقة بعد.</p>';
+                historyList.innerHTML = '<p class="text-xs text-gray-400 py-2">لا يوجد سجلات سابقة بعد، سيبدأ التسجيل التلقائي نهاية اليوم.</p>';
             } else {
                 appState.prayerLogs.forEach(log => {
                     let itemsHtml = '';
@@ -522,6 +597,7 @@
                     <div class="flex justify-between items-center py-2">
                         <span class="text-sm font-bold text-gray-300">${prayerNames[key]}</span>
                         <div class="flex items-center gap-3">
+                            <button onclick="editMissedSingle('${key}')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded border border-gray-700 text-yellow-400">تعديل ✏️</button>
                             <span class="text-lg font-black text-red-400">${count.toLocaleString()}</span>
                             <button onclick="decreaseMissed('${key}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1 rounded-lg">قضاء +1 🟢</button>
                         </div>
@@ -534,11 +610,9 @@
 
         function updateUI() {
             checkNewDay();
-
             document.getElementById('bm-balance').innerText = (appState.balances.bm || 0).toLocaleString() + ' EGP';
             document.getElementById('tinkoff-balance').innerText = (appState.balances.tinkoff || 0).toLocaleString() + ' RUB';
             document.getElementById('ozon-balance').innerText = (appState.balances.ozon || 0).toLocaleString() + ' RUB';
-
             renderPrayers();
         }
     </script>
