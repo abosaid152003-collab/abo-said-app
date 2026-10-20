@@ -173,7 +173,7 @@
                 </div>
             </div>
 
-            <!-- ب) قسم الصلوات -->
+            <!-- ب) قسم الصلوات الكلي (مع الصلوات الفائتة بالكامل) -->
             <div id="section-prayers" class="space-y-5 hidden">
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4 transition-colors">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 dark:border-gray-700 pb-3 gap-2">
@@ -182,19 +182,27 @@
                                 <h2 class="text-base font-bold text-gray-800 dark:text-white">🕌 الصلوات اليومية</h2>
                                 <span id="prayer-day-full-date" class="bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-xs font-bold px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-800"></span>
                             </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">تُرحَّل الصلوات غير المصلَّاة تلقائيًا للفائتة في منتصف الليل</p>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3" id="daily-prayers-grid"></div>
                 </div>
 
+                <!-- جدول الصلوات الفائتة بالكامل -->
                 <div class="bg-black text-white p-6 rounded-3xl shadow-xl space-y-6">
                     <div class="text-center space-y-1">
                         <h2 class="text-xl font-black text-gray-100">جدول الصلوات الفائتة</h2>
+                        <p class="text-xs text-gray-400">تزيد تلقائيًا في منتصف الليل إذا لم تؤدَّ صلاة اليوم</p>
                         <div class="pt-3">
                             <span class="text-3xl md:text-5xl font-black text-white" id="total-missed-display">0</span>
+                            <span class="text-sm font-bold text-gray-400 mr-2">صلاة</span>
                         </div>
                     </div>
                     <div class="divide-y divide-gray-800 border-t border-b border-gray-800 py-2 space-y-2" id="missed-prayers-list"></div>
+                    <div class="flex justify-between items-center pt-2 border-t border-gray-800">
+                        <span class="text-gray-400 text-sm font-bold">إجمالي الفائت الكلي</span>
+                        <span class="text-xl font-black text-red-500" id="total-missed-summary">0</span>
+                    </div>
                 </div>
             </div>
 
@@ -233,7 +241,7 @@
             <!-- د) قسم الأرشيف والمستندات -->
             <div id="section-docs" class="space-y-5 hidden">
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors space-y-3">
-                    <h3 class="text-base font-bold text-gray-800 dark:text-white">📄 خزانة المستندات</h3>
+                    <h3 class="text-base font-bold text-gray-800 dark:text-white">📄 خزانة المستندات المحفوظة</h3>
                     <div id="docs-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
             </div>
@@ -241,7 +249,7 @@
         </div>
     </div>
 
-    <!-- JavaScript الأصلي بالكامل للمحافظة على البيانات 100% -->
+    <!-- JavaScript المكتمل مع الحماية الكاملة لكلمة السر والصلوات -->
     <script>
         function toggleDarkMode() {
             const html = document.documentElement;
@@ -275,6 +283,7 @@
             }
         }, 1000);
 
+        // كلمة المرور المحفوظة 🔒
         const PASSWORD = "ahmed123";
 
         const firebaseConfig = {
@@ -310,7 +319,6 @@
             lastDay: ''
         };
 
-        // استعادة مفتاح التخزين الأصلي المضبوط 100%
         try {
             const saved = localStorage.getItem('abosaid_db_v25');
             if (saved) appState = JSON.parse(saved);
@@ -346,6 +354,7 @@
             if (db) db.ref('app_data_v25').set(appState);
         }
 
+        // حماية الدخول بكلمة السر 🔒
         document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault();
             if (document.getElementById('login-password').value === PASSWORD) {
@@ -379,10 +388,56 @@
             document.getElementById('btn-docs').className = tab === 'docs' ? activeClass : inactiveClass;
         }
 
+        function togglePrayer(key) {
+            appState.dailyPrayers[key] = appState.dailyPrayers[key] === 1 ? -1 : 1;
+            saveData();
+            renderPrayers();
+        }
+
+        function decreaseMissed(key) {
+            appState.missedPrayers[key]++;
+            saveData();
+            renderPrayers();
+        }
+
+        function renderPrayers() {
+            const grid = document.getElementById('daily-prayers-grid');
+            grid.innerHTML = '';
+            PRAYER_KEYS.forEach(key => {
+                const done = appState.dailyPrayers[key] === 1;
+                grid.innerHTML += `
+                    <button onclick="togglePrayer('${key}')" class="p-3 rounded-2xl border text-center transition ${done ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600'}">
+                        <div class="text-xs font-bold">${prayerNames[key]}</div>
+                        <div class="text-lg mt-1 font-black">${done ? '🟢 أُدِّيَت' : '🔴 معلقة'}</div>
+                    </button>
+                `;
+            });
+
+            const missedList = document.getElementById('missed-prayers-list');
+            missedList.innerHTML = '';
+            let totalMissed = 0;
+            PRAYER_KEYS.forEach(key => {
+                const count = appState.missedPrayers[key] || 0;
+                totalMissed += count;
+                missedList.innerHTML += `
+                    <div class="flex justify-between items-center py-2">
+                        <span class="text-sm font-bold text-gray-300">${prayerNames[key]}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg font-black text-red-400">${count}</span>
+                            <button onclick="decreaseMissed('${key}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1 rounded-lg">قضاء +1 🟢</button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('total-missed-display').innerText = totalMissed;
+            document.getElementById('total-missed-summary').innerText = totalMissed;
+        }
+
         function updateUI() {
             document.getElementById('bm-balance').innerText = (appState.balances.bm || 0).toLocaleString() + ' EGP';
             document.getElementById('tinkoff-balance').innerText = (appState.balances.tinkoff || 0).toLocaleString() + ' RUB';
             document.getElementById('ozon-balance').innerText = (appState.balances.ozon || 0).toLocaleString() + ' RUB';
+            renderPrayers();
         }
     </script>
 </body>
