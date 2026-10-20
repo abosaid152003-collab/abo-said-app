@@ -158,3 +158,487 @@
                         <table class="w-full text-right border-collapse text-sm text-gray-800 dark:text-gray-200">
                             <thead>
                                 <tr class="border-b border-gray-200 dark:border-gray-700 text-gray-400 text-xs">
+                                    <th class="pb-2">النوع</th>
+                                    <th class="pb-2">الوصف</th>
+                                    <th class="pb-2">المبلغ</th>
+                                    <th class="pb-2">البنك</th>
+                                    <th class="pb-2">التصنيف</th>
+                                    <th class="pb-2">التاريخ</th>
+                                    <th class="pb-2 text-center">حذف</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trans-table" class="divide-y divide-gray-100 dark:divide-gray-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ب) قسم الصلوات مع تحديد الموقع المباشر والمستهدف أوتوماتيكياً 🔥 -->
+            <div id="section-prayers" class="space-y-5 hidden">
+                
+                <!-- 1. العد التنازلي التلقائي للصلاة القادمة مع الموقع المباشر 📍 -->
+                <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-5 rounded-3xl shadow-lg space-y-2 text-center">
+                    <div class="text-xs text-blue-200 font-bold">📍 مواقيت الصلاة بتوقيت: <span id="current-user-location" class="bg-blue-900/60 px-2.5 py-1 rounded text-yellow-300 font-black">جاري تحديد موقعك تلقائياً...</span></div>
+                    <div class="text-xs text-blue-200 font-bold pt-1">⏳ الوقت المتبقي على أذان <span id="next-prayer-name" class="text-yellow-300 font-black text-sm">...</span></div>
+                    <div class="text-3xl md:text-5xl font-black tracking-widest font-mono py-1 text-yellow-300" id="prayer-countdown">00:00:00</div>
+                    <div class="text-xs text-blue-100" id="next-prayer-time-desc">جاري جلب مواقيت الصلاة اليومية تلقائياً...</div>
+                </div>
+
+                <!-- 2. الصلوات اليومية (محمية بكلمة السر 🔐) -->
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4 transition-colors">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 dark:border-gray-700 pb-3 gap-2">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-base font-bold text-gray-800 dark:text-white">🕌 الصلوات اليومية</h2>
+                                <span id="prayer-day-full-date" class="bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-xs font-bold px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-800"></span>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">تعديل أي صلاة يتطلب كلمة السر (🔐)</p>
+                        </div>
+                        <button onclick="resetDailyPrayersWithAuth()" class="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded-lg border border-red-200 font-bold hover:bg-red-100">إعادة ضبط اليوم 🔐</button>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3" id="daily-prayers-grid"></div>
+                </div>
+
+                <!-- 3. السجل التاريخي للصلوات السابقة -->
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-3 transition-colors">
+                    <h3 class="text-base font-bold text-gray-800 dark:text-white">📅 السجل التاريخي للصلوات السابقة</h3>
+                    <div id="prayer-history-list" class="space-y-2 max-h-60 overflow-y-auto pr-1 divide-y divide-gray-100 dark:divide-gray-700"></div>
+                </div>
+
+                <!-- 4. جدول الصلوات الفائتة وتعديل أعدادها بكلمة السر -->
+                <div class="bg-black text-white p-6 rounded-3xl shadow-xl space-y-6">
+                    <div class="text-center space-y-1">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-xl font-black text-gray-100">جدول الصلوات الفائتة</h2>
+                            <button onclick="editAllMissedWithAuth()" class="text-xs bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-3 py-1 rounded-lg transition">تعديل الأعداد 🔐</button>
+                        </div>
+                        <p class="text-xs text-gray-400">تزيد تلقائيًا في منتصف الليل إذا لم تؤدَّ صلاة اليوم</p>
+                        <div class="pt-3">
+                            <span class="text-3xl md:text-5xl font-black text-white" id="total-missed-display">0</span>
+                            <span class="text-sm font-bold text-gray-400 mr-2">صلاة</span>
+                        </div>
+                    </div>
+                    <div class="divide-y divide-gray-800 border-t border-b border-gray-800 py-2 space-y-2" id="missed-prayers-list"></div>
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="text-gray-400 text-sm font-bold">الإجمالي الفائت</span>
+                        <span class="text-xl font-black text-red-500" id="total-missed-summary">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ج) قسم الديون والجمعيات -->
+            <div id="section-debts" class="space-y-5 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="bg-emerald-600 text-white p-4 rounded-2xl shadow-sm">
+                        <div class="text-xs opacity-90 font-bold">إجمالي فلوس ليَّ عند الناس 🟢</div>
+                        <div class="text-2xl font-black mt-1" id="total-receivable">0 EGP / 0 RUB</div>
+                    </div>
+                    <div class="bg-rose-600 text-white p-4 rounded-2xl shadow-sm">
+                        <div class="text-xs opacity-90 font-bold">إجمالي ديون عليَّ للناس 🔻</div>
+                        <div class="text-2xl font-black mt-1" id="total-payable">0 EGP / 0 RUB</div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors space-y-3">
+                    <h3 class="text-base font-bold text-gray-800 dark:text-white">تسجيل معاملة / دين جديد</h3>
+                    <form id="debt-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+                        <select id="d-type" class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm font-bold">
+                            <option value="receivable">🟢 فلوس ليَّ عند شخص</option>
+                            <option value="payable">🔻 دين عليَّ لشخص</option>
+                        </select>
+                        <input type="text" id="d-name" placeholder="اسم الشخص" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
+                        <input type="number" step="0.01" id="d-amount" placeholder="المبلغ" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
+                        <select id="d-curr" class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
+                            <option value="EGP">جنيه (EGP)</option>
+                            <option value="RUB">روبل (RUB)</option>
+                        </select>
+                        <input type="text" id="d-phone" placeholder="رقم الهاتف (للتذكير)" class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm">حفظ الدين</button>
+                    </form>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors space-y-3">
+                    <h3 class="text-base font-bold text-gray-800 dark:text-white">سجل الديون والالتزامات</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right border-collapse text-sm text-gray-800 dark:text-gray-200">
+                            <thead>
+                                <tr class="border-b border-gray-200 dark:border-gray-700 text-gray-400 text-xs">
+                                    <th class="pb-2">النوع</th>
+                                    <th class="pb-2">الاسم</th>
+                                    <th class="pb-2">المبلغ</th>
+                                    <th class="pb-2 text-center">تذكير واتساب</th>
+                                    <th class="pb-2 text-center">إجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody id="debts-table" class="divide-y divide-gray-100 dark:divide-gray-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- د) قسم الأرشيف والمستندات -->
+            <div id="section-docs" class="space-y-5 hidden">
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors space-y-3">
+                    <h3 class="text-base font-bold text-gray-800 dark:text-white">📄 خزانة المستندات المحفوظة</h3>
+                    <div id="docs-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JavaScript المطور بكشف الموقع التلقائي 📍 -->
+    <script>
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.innerText = '🌙';
+                localStorage.setItem('app_theme', 'light');
+            } else {
+                html.classList.add('dark');
+                icon.innerText = '☀️';
+                localStorage.setItem('app_theme', 'dark');
+            }
+        }
+
+        if (localStorage.getItem('app_theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.getElementById('theme-icon').innerText = '☀️';
+        }
+
+        let countdown = 5;
+        const countEl = document.getElementById('countdown-number');
+        const timer = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+                countEl.innerText = countdown;
+            } else {
+                clearInterval(timer);
+                document.getElementById('welcome-screen').style.display = 'none';
+                document.getElementById('login-screen').style.display = 'flex';
+            }
+        }, 1000);
+
+        const PASSWORD = "ahmed123";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAmbQaIWA0KLQGHD1aeTHfUcl4RIHtmQNY",
+            authDomain: "abo-said-app-ee7fc.firebaseapp.com",
+            databaseURL: "https://abo-said-app-ee7fc-default-rtdb.firebaseio.com",
+            projectId: "abo-said-app-ee7fc",
+            storageBucket: "abo-said-app-ee7fc.firebasestorage.app",
+            messagingSenderId: "661467346684",
+            appId: "1:661467346684:web:ab75192bc0b52910470979"
+        };
+
+        let db = null;
+        try {
+            if (typeof firebase !== 'undefined') {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+            }
+        } catch(e) {}
+
+        const PRAYER_KEYS = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+        const prayerNames = { fajr: 'الفجر', dhuhr: 'الظهر', asr: 'العصر', maghrib: 'المغرب', isha: 'العشاء' };
+        let fetchedPrayerTimes = null;
+
+        let appState = {
+            balances: { bm: 0, tinkoff: 0, ozon: 0 },
+            transactions: [],
+            dailyPrayers: { fajr: -1, dhuhr: -1, asr: -1, maghrib: -1, isha: -1 },
+            missedPrayers: { fajr: -2103, dhuhr: -2103, asr: -2103, maghrib: -2103, isha: -2103 },
+            prayerLogs: [], 
+            debts: [],
+            associations: [],
+            documents: [],
+            lastDay: ''
+        };
+
+        try {
+            const saved = localStorage.getItem('abosaid_db_v25');
+            if (saved) appState = JSON.parse(saved);
+        } catch(e){}
+
+        if (db) {
+            db.ref('app_data_v25').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    if (data.balances) appState.balances = data.balances;
+                    if (data.transactions) appState.transactions = data.transactions;
+                    if (data.dailyPrayers) appState.dailyPrayers = data.dailyPrayers;
+                    if (data.missedPrayers) appState.missedPrayers = data.missedPrayers;
+                    if (data.prayerLogs) appState.prayerLogs = data.prayerLogs;
+                    if (data.debts) appState.debts = data.debts;
+                    if (data.associations) appState.associations = data.associations;
+                    if (data.documents) appState.documents = data.documents;
+                    if (data.lastDay) appState.lastDay = data.lastDay;
+                    saveDataLocal();
+                }
+                if (document.getElementById('main-app').style.display !== 'none') {
+                    updateUI();
+                }
+            });
+        }
+
+        function saveDataLocal() {
+            try { localStorage.setItem('abosaid_db_v25', JSON.stringify(appState)); } catch(e){}
+        }
+
+        function saveData() {
+            saveDataLocal();
+            if (db) db.ref('app_data_v25').set(appState);
+        }
+
+        function checkAuth() {
+            const pwd = prompt("أدخل كلمة السر للتعديل:");
+            if (pwd === PASSWORD) return true;
+            alert("كلمة السر غير صحيحة!");
+            return false;
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (document.getElementById('login-password').value === PASSWORD) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                document.getElementById('login-error').classList.add('hidden');
+                updateUI();
+                fetchAutoLocationAndPrayerTimes();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            document.getElementById('main-app').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('login-password').value = '';
+        });
+
+        function checkNewDay() {
+            const now = new Date();
+            const todayStr = now.toLocaleDateString('ar-EG');
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('prayer-day-full-date').innerText = now.toLocaleDateString('ar-EG', options);
+
+            if (appState.lastDay && appState.lastDay !== todayStr) {
+                if (!appState.prayerLogs) appState.prayerLogs = [];
+                appState.prayerLogs.unshift({ date: appState.lastDay, prayers: { ...appState.dailyPrayers } });
+                PRAYER_KEYS.forEach(key => { if (appState.dailyPrayers[key] === -1) appState.missedPrayers[key] -= 1; });
+                appState.dailyPrayers = { fajr: -1, dhuhr: -1, asr: -1, maghrib: -1, isha: -1 };
+                appState.lastDay = todayStr;
+                saveData();
+            } else if (!appState.lastDay) {
+                appState.lastDay = todayStr;
+                saveData();
+            }
+            document.getElementById('today-date-display').innerText = todayStr;
+        }
+
+        function switchTab(tab) {
+            document.getElementById('section-money').classList.toggle('hidden', tab !== 'money');
+            document.getElementById('section-prayers').classList.toggle('hidden', tab !== 'prayers');
+            document.getElementById('section-debts').classList.toggle('hidden', tab !== 'debts');
+            document.getElementById('section-docs').classList.toggle('hidden', tab !== 'docs');
+
+            const activeClass = "px-3.5 py-2 rounded-xl font-bold text-xs md:text-sm bg-blue-600 text-white shadow-sm";
+            const inactiveClass = "px-3.5 py-2 rounded-xl font-bold text-xs md:text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200";
+
+            document.getElementById('btn-money').className = tab === 'money' ? activeClass : inactiveClass;
+            document.getElementById('btn-prayers').className = tab === 'prayers' ? activeClass : inactiveClass;
+            document.getElementById('btn-debts').className = tab === 'debts' ? activeClass : inactiveClass;
+            document.getElementById('btn-docs').className = tab === 'docs' ? activeClass : inactiveClass;
+        }
+
+        // تحديد الموقع الجغرافي المباشر بالكامل وإحضار المواعيد الدقيقة 📍
+        async function fetchAutoLocationAndPrayerTimes() {
+            let city = "Cairo";
+            let country = "Egypt";
+            let displayLocation = "القاهرة، مصر";
+
+            try {
+                const geoRes = await fetch('https://ipapi.co/json/');
+                const geoData = await geoRes.json();
+                if (geoData && geoData.city && geoData.country_name) {
+                    city = geoData.city;
+                    country = geoData.country_name;
+                    displayLocation = `${city}، ${country}`;
+                }
+            } catch (e) {
+                console.log("استخدام الموقع الافتراضي عند عدم التمكن من كشف IP");
+            }
+
+            document.getElementById('current-user-location').innerText = displayLocation;
+
+            try {
+                const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=5`);
+                const data = await res.json();
+                if (data && data.data && data.data.timings) {
+                    const t = data.data.timings;
+                    fetchedPrayerTimes = {
+                        fajr: t.Fajr,
+                        dhuhr: t.Dhuhr,
+                        asr: t.Asr,
+                        maghrib: t.Maghrib,
+                        isha: t.Isha
+                    };
+                    renderPrayers();
+                    startPrayerCountdown();
+                }
+            } catch (e) {}
+        }
+
+        function startPrayerCountdown() {
+            setInterval(() => {
+                if (!fetchedPrayerTimes) return;
+                const now = new Date();
+                let nextPrayer = null;
+                let minDiff = Infinity;
+
+                PRAYER_KEYS.forEach(key => {
+                    const [h, m] = fetchedPrayerTimes[key].split(':');
+                    const pDate = new Date();
+                    pDate.setHours(parseInt(h), parseInt(m), 0, 0);
+                    
+                    let diff = pDate - now;
+                    if (diff < 0) {
+                        pDate.setDate(pDate.getDate() + 1);
+                        diff = pDate - now;
+                    }
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        nextPrayer = { name: prayerNames[key], timeStr: fetchedPrayerTimes[key], diff };
+                    }
+                });
+
+                if (nextPrayer) {
+                    document.getElementById('next-prayer-name').innerText = nextPrayer.name;
+                    document.getElementById('next-prayer-time-desc').innerText = `موعد أذان ${nextPrayer.name}: ${nextPrayer.timeStr}`;
+                    
+                    const totalSec = Math.floor(nextPrayer.diff / 1000);
+                    const hours = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+                    const mins = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+                    const secs = String(totalSec % 60).padStart(2, '0');
+                    
+                    document.getElementById('prayer-countdown').innerText = `${hours}:${mins}:${secs}`;
+                }
+            }, 1000);
+        }
+
+        function togglePrayerWithAuth(key) {
+            if (checkAuth()) {
+                appState.dailyPrayers[key] = appState.dailyPrayers[key] === 1 ? -1 : 1;
+                saveData();
+                renderPrayers();
+            }
+        }
+
+        function resetDailyPrayersWithAuth() {
+            if (checkAuth()) {
+                appState.dailyPrayers = { fajr: -1, dhuhr: -1, asr: -1, maghrib: -1, isha: -1 };
+                saveData();
+                renderPrayers();
+            }
+        }
+
+        function editMissedSingle(key) {
+            if (checkAuth()) {
+                const current = appState.missedPrayers[key] || 0;
+                const newVal = prompt(`أدخل العدد الجديد لصلوات ${prayerNames[key]} الفائتة:`, current);
+                if (newVal !== null && !isNaN(newVal)) {
+                    appState.missedPrayers[key] = parseInt(newVal);
+                    saveData();
+                    renderPrayers();
+                }
+            }
+        }
+
+        function editAllMissedWithAuth() {
+            if (checkAuth()) {
+                PRAYER_KEYS.forEach(key => {
+                    const val = prompt(`أدخل العدد الجديد لـ ${prayerNames[key]} الفائتة:`, appState.missedPrayers[key] || 0);
+                    if (val !== null && !isNaN(val)) {
+                        appState.missedPrayers[key] = parseInt(val);
+                    }
+                });
+                saveData();
+                renderPrayers();
+            }
+        }
+
+        function decreaseMissed(key) {
+            if (checkAuth()) {
+                appState.missedPrayers[key] += 1;
+                saveData();
+                renderPrayers();
+            }
+        }
+
+        function renderPrayers() {
+            const grid = document.getElementById('daily-prayers-grid');
+            grid.innerHTML = '';
+            PRAYER_KEYS.forEach(key => {
+                const done = appState.dailyPrayers[key] === 1;
+                const timeText = fetchedPrayerTimes ? fetchedPrayerTimes[key] : '';
+                grid.innerHTML += `
+                    <button onclick="togglePrayerWithAuth('${key}')" class="p-3 rounded-2xl border text-center transition ${done ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600'}">
+                        <div class="text-xs font-bold">${prayerNames[key]} ${timeText ? '(' + timeText + ')' : ''}</div>
+                        <div class="text-lg mt-1 font-black">${done ? '🟢 أُدِّيَت' : '🔴 معلقة'}</div>
+                    </button>
+                `;
+            });
+
+            const historyList = document.getElementById('prayer-history-list');
+            historyList.innerHTML = '';
+            if (!appState.prayerLogs || appState.prayerLogs.length === 0) {
+                historyList.innerHTML = '<p class="text-xs text-gray-400 py-2">لا يوجد سجلات سابقة بعد، سيبدأ التسجيل التلقائي نهاية اليوم.</p>';
+            } else {
+                appState.prayerLogs.forEach(log => {
+                    let itemsHtml = '';
+                    PRAYER_KEYS.forEach(k => {
+                        const isDone = log.prayers && log.prayers[k] === 1;
+                        itemsHtml += `<span class="text-xs px-2 py-0.5 rounded ${isDone ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">${prayerNames[k]}: ${isDone ? '🟢' : '🔴'}</span>`;
+                    });
+                    historyList.innerHTML += `
+                        <div class="py-2 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                            <span class="text-xs font-bold text-gray-700 dark:text-gray-300">${log.date}</span>
+                            <div class="flex flex-wrap gap-1">${itemsHtml}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            const missedList = document.getElementById('missed-prayers-list');
+            missedList.innerHTML = '';
+            let totalMissed = 0;
+            PRAYER_KEYS.forEach(key => {
+                const count = appState.missedPrayers[key] || 0;
+                totalMissed += count;
+                missedList.innerHTML += `
+                    <div class="flex justify-between items-center py-2">
+                        <span class="text-sm font-bold text-gray-300">${prayerNames[key]}</span>
+                        <div class="flex items-center gap-3">
+                            <button onclick="editMissedSingle('${key}')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded border border-gray-700 text-yellow-400">تعديل ✏️</button>
+                            <span class="text-lg font-black text-red-400">${count.toLocaleString()}</span>
+                            <button onclick="decreaseMissed('${key}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1 rounded-lg">قضاء +1 🟢</button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('total-missed-display').innerText = totalMissed.toLocaleString();
+            document.getElementById('total-missed-summary').innerText = totalMissed.toLocaleString();
+        }
+
+        function updateUI() {
+            checkNewDay();
+            document.getElementById('bm-balance').innerText = (appState.balances.bm || 0).toLocaleString() + ' EGP';
+            document.getElementById('tinkoff-balance').innerText = (appState.balances.tinkoff || 0).toLocaleString() + ' RUB';
+            document.getElementById('ozon-balance').innerText = (appState.balances.ozon || 0).toLocaleString() + ' RUB';
+            renderPrayers();
+        }
+    </script>
+</body>
+</html>
