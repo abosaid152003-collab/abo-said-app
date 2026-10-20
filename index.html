@@ -173,8 +173,9 @@
                 </div>
             </div>
 
-            <!-- ب) قسم الصلوات -->
+            <!-- ب) قسم الصلوات (مع السجل والتسجيل اليومي الفائق) -->
             <div id="section-prayers" class="space-y-5 hidden">
+                <!-- صلوات اليوم -->
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4 transition-colors">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 dark:border-gray-700 pb-3 gap-2">
                         <div>
@@ -182,32 +183,29 @@
                                 <h2 class="text-base font-bold text-gray-800 dark:text-white">🕌 الصلوات اليومية</h2>
                                 <span id="prayer-day-full-date" class="bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-xs font-bold px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-800"></span>
                             </div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">تُرحَّل الصلوات غير المصلَّاة تلقائيًا للفائتة في منتصف الليل</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">تُرحَّل الصلوات غير المصلَّاة تلقائيًا للفائتة في منتصف الليل وتتسجل في السجل</p>
                         </div>
-                        <button onclick="resetDailyPrayers()" class="text-xs text-red-500 hover:underline">إعادة ضبط (-1)</button>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3" id="daily-prayers-grid"></div>
                 </div>
 
+                <!-- السجل التاريخي للصلوات -->
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-3 transition-colors">
-                    <h3 class="text-base font-bold text-gray-800 dark:text-white">📅 السجل التاريخي للصلوات السابقة</h3>
+                    <h3 class="text-base font-bold text-gray-800 dark:text-white">📅 السجل التاريخي للصلوات</h3>
                     <div id="prayer-history-list" class="space-y-2 max-h-60 overflow-y-auto pr-1 divide-y divide-gray-100 dark:divide-gray-700"></div>
                 </div>
 
+                <!-- جدول الصلوات الفائتة -->
                 <div class="bg-black text-white p-6 rounded-3xl shadow-xl space-y-6">
                     <div class="text-center space-y-1">
                         <h2 class="text-xl font-black text-gray-100">جدول الصلوات الفائتة</h2>
-                        <p class="text-xs text-gray-400">تزيد تلقائيًا في منتصف الليل إذا لم تؤدَّ صلاة اليوم</p>
+                        <p class="text-xs text-gray-400">تزيد تلقائيًا في منتصف الليل للصلوات التي لم تؤدَّ</p>
                         <div class="pt-3">
-                            <span class="text-3xl md:text-5xl font-black text-white" id="total-missed-display">-10,515</span>
-                            <span class="text-sm font-bold text-gray-400 mr-2">صلاة</span>
+                            <span class="text-3xl md:text-5xl font-black text-red-500" id="total-missed-display">0</span>
+                            <span class="text-sm font-bold text-gray-400 mr-2">صلاة فائتة</span>
                         </div>
                     </div>
                     <div class="divide-y divide-gray-800 border-t border-b border-gray-800 py-2 space-y-2" id="missed-prayers-list"></div>
-                    <div class="flex justify-between items-center pt-2">
-                        <span class="text-gray-400 text-sm font-bold">الإجمالي الفائت</span>
-                        <span class="text-xl font-black text-red-500" id="total-missed-summary">-10,515</span>
-                    </div>
                 </div>
             </div>
 
@@ -215,11 +213,11 @@
             <div id="section-debts" class="space-y-5 hidden">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div class="bg-emerald-600 text-white p-4 rounded-2xl shadow-sm">
-                        <div class="text-xs opacity-90 font-bold">إجمالي فلوس ليَّ عند الناس 🟢</div>
+                        <div class="text-xs opacity-90 font-bold">إجمالي فلوس ليَّ عند الناس 🟢</div>
                         <div class="text-2xl font-black mt-1" id="total-receivable">0 EGP / 0 RUB</div>
                     </div>
                     <div class="bg-rose-600 text-white p-4 rounded-2xl shadow-sm">
-                        <div class="text-xs opacity-90 font-bold">إجمالي ديون عليَّ للناس 🔻</div>
+                        <div class="text-xs opacity-90 font-bold">إجمالي ديون عليَّ للناس 🔻</div>
                         <div class="text-2xl font-black mt-1" id="total-payable">0 EGP / 0 RUB</div>
                     </div>
                 </div>
@@ -228,8 +226,8 @@
                     <h3 class="text-base font-bold text-gray-800 dark:text-white">تسجيل معاملة / دين جديد</h3>
                     <form id="debt-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
                         <select id="d-type" class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm font-bold">
-                            <option value="receivable">🟢 فلوس ليَّ عند شخص</option>
-                            <option value="payable">🔻 دين عليَّ لشخص</option>
+                            <option value="receivable">🟢 فلوس ليَّ عند شخص</option>
+                            <option value="payable">🔻 دين عليَّ لشخص</option>
                         </select>
                         <input type="text" id="d-name" placeholder="اسم الشخص" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
                         <input type="number" step="0.01" id="d-amount" placeholder="المبلغ" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
@@ -259,47 +257,20 @@
                         </table>
                     </div>
                 </div>
-
-                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors space-y-4">
-                    <h3 class="text-base font-bold text-gray-800 dark:text-white">🏦 متابع الجمعيات المالية</h3>
-                    <form id="assoc-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                        <input type="text" id="a-name" placeholder="اسم الجمعية" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
-                        <input type="number" id="a-payout" placeholder="مبلغ القبض الكلي" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
-                        <input type="number" id="a-monthly" placeholder="القسط الشهري" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
-                        <input type="text" id="a-date" placeholder="تاريخ دورك في القبض" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
-                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm">إضافة جمعية</button>
-                    </form>
-
-                    <div id="assoc-list" class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2"></div>
-                </div>
             </div>
 
-            <!-- د) قسم الأرشيف والمستندات (الجديد مع رفع وتنزيل الملفات 🔥) -->
+            <!-- د) قسم الأرشيف والمستندات -->
             <div id="section-docs" class="space-y-5 hidden">
-                <!-- رفع مستند جديد -->
                 <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors space-y-3">
                     <h3 class="text-base font-bold text-gray-800 dark:text-white">📁 حفظ وتخزين مستند جديد</h3>
                     <form id="doc-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        <input type="text" id="doc-title" placeholder="اسم المستند (مثال: جواز السفر)" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
+                        <input type="text" id="doc-title" placeholder="اسم المستند" required class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
                         <input type="text" id="doc-number" placeholder="رقم الوثيقة / الكارت" class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
                         <input type="date" id="doc-expiry" class="p-2.5 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-xl text-sm">
-                        
-                        <!-- اختيار ملف من الجهاز -->
-                        <div class="col-span-1 md:col-span-2 lg:col-span-3">
-                            <label class="block text-xs font-bold text-gray-500 dark:text-gray-300 mb-1">اختر صورة المستند أو ملف PDF من جهازك:</label>
-                            <input type="file" id="doc-file" accept="image/*,.pdf" class="w-full text-xs text-gray-500 bg-gray-50 dark:bg-gray-700 p-2 border border-gray-200 dark:border-gray-600 rounded-xl">
-                        </div>
-
                         <button type="submit" class="col-span-1 md:col-span-2 lg:col-span-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm shadow">
                             حفظ المستند في الأرشيف 💾
                         </button>
                     </form>
-                </div>
-
-                <!-- قائمة المستندات المحفوظة -->
-                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors space-y-4">
-                    <h3 class="text-base font-bold text-gray-800 dark:text-white">📄 خزانة المستندات المحفوظة</h3>
-                    <div id="docs-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
             </div>
 
@@ -362,17 +333,14 @@
 
         const PRAYER_KEYS = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
         const prayerNames = { fajr: 'الفجر', dhuhr: 'الظهر', asr: 'العصر', maghrib: 'المغرب', isha: 'العشاء' };
-        const bankInfo = { bm: { name: 'بنك مصر', curr: 'EGP' }, tinkoff: { name: 'بنك تينكوف', curr: 'RUB' }, ozon: { name: 'بنك أوزون', curr: 'RUB' } };
 
         let appState = {
             balances: { bm: 0, tinkoff: 0, ozon: 0 },
             transactions: [],
-            dailyPrayers: { fajr: -1, dhuhr: -1, asr: -1, maghrib: -1, isha: -1 },
-            missedPrayers: { fajr: -2103, dhuhr: -2103, asr: -2103, maghrib: -2103, isha: -2103 },
-            prayerLogs: [], 
+            dailyPrayers: { fajr: 0, dhuhr: 0, asr: 0, maghrib: 0, isha: 0 },
+            missedPrayers: { fajr: 0, dhuhr: 0, asr: 0, maghrib: 0, isha: 0 },
+            prayerLogs: [],
             debts: [],
-            associations: [],
-            documents: [],
             lastDay: ''
         };
 
@@ -391,8 +359,6 @@
                     if (data.missedPrayers) appState.missedPrayers = data.missedPrayers;
                     if (data.prayerLogs) appState.prayerLogs = data.prayerLogs;
                     if (data.debts) appState.debts = data.debts;
-                    if (data.associations) appState.associations = data.associations;
-                    if (data.documents) appState.documents = data.documents;
                     if (data.lastDay) appState.lastDay = data.lastDay;
                     saveDataLocal();
                 }
@@ -437,9 +403,22 @@
 
             if (appState.lastDay && appState.lastDay !== todayStr) {
                 if (!appState.prayerLogs) appState.prayerLogs = [];
-                appState.prayerLogs.unshift({ date: appState.lastDay, prayers: { ...appState.dailyPrayers } });
-                PRAYER_KEYS.forEach(key => { if (appState.dailyPrayers[key] === -1) appState.missedPrayers[key] -= 1; });
-                appState.dailyPrayers = { fajr: -1, dhuhr: -1, asr: -1, maghrib: -1, isha: -1 };
+                
+                // حفظ لقطة من يوم أمس في السجل
+                appState.prayerLogs.unshift({
+                    date: appState.lastDay,
+                    prayers: { ...appState.dailyPrayers }
+                });
+
+                // ترحيل أي صلاة لم تُصَلَّ (قيمتها 0) إلى جدول الفائتة (+1)
+                PRAYER_KEYS.forEach(key => {
+                    if (appState.dailyPrayers[key] !== 1) {
+                        appState.missedPrayers[key] = (appState.missedPrayers[key] || 0) + 1;
+                    }
+                });
+
+                // تصفير اليوم الجديد
+                appState.dailyPrayers = { fajr: 0, dhuhr: 0, asr: 0, maghrib: 0, isha: 0 };
                 appState.lastDay = todayStr;
                 saveData();
             } else if (!appState.lastDay) {
@@ -464,325 +443,78 @@
             document.getElementById('btn-docs').className = tab === 'docs' ? activeClass : inactiveClass;
         }
 
-        function updateUI() {
-            checkNewDay();
-
-            document.getElementById('bm-balance').innerText = appState.balances.bm.toLocaleString() + ' EGP';
-            document.getElementById('tinkoff-balance').innerText = appState.balances.tinkoff.toLocaleString() + ' RUB';
-            document.getElementById('ozon-balance').innerText = appState.balances.ozon.toLocaleString() + ' RUB';
-
-            const todayStr = new Date().toLocaleDateString('ar-EG');
-            let todayInc = 0, todayExp = 0;
-            const tBody = document.getElementById('trans-table');
-            tBody.innerHTML = '';
-
-            (appState.transactions || []).forEach((item, idx) => {
-                if (item.date === todayStr) {
-                    if (item.type === 'income') todayInc += item.amount;
-                    if (item.type === 'expense') todayExp += item.amount;
-                }
-                const isInc = item.type === 'income';
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="py-2.5 font-bold ${isInc ? 'text-green-600' : 'text-red-600'}">${isInc ? '🟢 إضافة' : '🔻 مصروف'}</td>
-                    <td class="py-2.5 font-medium">${item.desc}</td>
-                    <td class="py-2.5 font-bold ${isInc ? 'text-green-600' : 'text-red-600'}">${isInc ? '+' : '-'}${item.amount} ${bankInfo[item.bank].curr}</td>
-                    <td class="py-2.5 text-gray-500 dark:text-gray-400">${bankInfo[item.bank].name}</td>
-                    <td class="py-2.5"><span class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded text-xs">${item.category || 'عام'}</span></td>
-                    <td class="py-2.5 text-xs text-gray-400">${item.date}</td>
-                    <td class="py-2.5 text-center"><button onclick="deleteTrans(${idx})" class="text-red-500 font-bold">✕</button></td>
-                `;
-                tBody.appendChild(tr);
-            });
-
-            document.getElementById('today-income').innerText = '+' + todayInc.toLocaleString();
-            document.getElementById('today-expense').innerText = '-' + todayExp.toLocaleString();
-            
-            const net = todayInc - todayExp;
-            const netEl = document.getElementById('today-net');
-            netEl.innerText = (net >= 0 ? '+' : '') + net.toLocaleString() + (net >= 0 ? ' (ربح اليوم)' : ' (خسارة اليوم)');
-            netEl.className = 'text-xl font-black mt-1 ' + (net >= 0 ? 'text-green-600' : 'text-red-600');
-
-            // الصلوات
-            const dGrid = document.getElementById('daily-prayers-grid');
-            dGrid.innerHTML = '';
-            PRAYER_KEYS.forEach(k => {
-                const isDone = (appState.dailyPrayers[k] === 0);
-                const card = document.createElement('div');
-                card.className = "p-3 rounded-xl border text-center cursor-pointer transition " + (isDone ? "bg-green-50 dark:bg-green-950 border-green-400 text-green-900 dark:text-green-200" : "bg-red-50 dark:bg-red-950 border-red-200 text-red-900 dark:text-red-200");
-                card.onclick = () => toggleDailyPrayer(k);
-                card.innerHTML = `
-                    <div class="font-bold text-sm">${prayerNames[k]}</div>
-                    <div class="text-2xl font-black ${isDone ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">${appState.dailyPrayers[k]}</div>
-                    <div class="text-[10px] px-2 py-0.5 rounded-full ${isDone ? 'bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-100 font-bold' : 'bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-100'}">${isDone ? 'تمت ✓' : 'لم تُصَلَّ (-1)'}</div>
-                `;
-                dGrid.appendChild(card);
-            });
-
-            const mList = document.getElementById('missed-prayers-list');
-            mList.innerHTML = '';
-            let totalM = 0;
-            PRAYER_KEYS.forEach(k => {
-                totalM += appState.missedPrayers[k];
-                const row = document.createElement('div');
-                row.className = "flex justify-between items-center py-2 px-1";
-                row.innerHTML = `
-                    <span class="text-lg font-bold text-white">${appState.missedPrayers[k].toLocaleString()}</span>
-                    <div class="flex items-center gap-3">
-                        <button onclick="prayMissed('${k}')" class="bg-emerald-600 text-white text-xs px-2.5 py-1 rounded-lg font-bold">قضيت صلاة ✓</button>
-                        <button onclick="editMissed('${k}')" class="bg-gray-800 text-gray-300 text-xs px-2 py-1 rounded-lg">تعديل</button>
-                        <span class="text-gray-300 font-bold text-base w-12 text-left">${prayerNames[k]}</span>
-                    </div>
-                `;
-                mList.appendChild(row);
-            });
-            document.getElementById('total-missed-display').innerText = totalM.toLocaleString();
-            document.getElementById('total-missed-summary').innerText = totalM.toLocaleString();
-
-            // الديون
-            let recEgp = 0, recRub = 0, payEgp = 0, payRub = 0;
-            const debtsTbody = document.getElementById('debts-table');
-            debtsTbody.innerHTML = '';
-
-            (appState.debts || []).forEach((d, idx) => {
-                if (d.type === 'receivable') {
-                    if (d.curr === 'EGP') recEgp += d.amount; else recRub += d.amount;
-                } else {
-                    if (d.curr === 'EGP') payEgp += d.amount; else payRub += d.amount;
-                }
-
-                const isRec = d.type === 'receivable';
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="py-2.5 font-bold ${isRec ? 'text-emerald-600' : 'text-rose-600'}">${isRec ? '🟢 ليَّ عند' : '🔻 عليَّ لـ'}</td>
-                    <td class="py-2.5 font-bold">${d.name}</td>
-                    <td class="py-2.5 font-bold">${d.amount.toLocaleString()} ${d.curr}</td>
-                    <td class="py-2.5 text-center">
-                        ${d.phone ? `<button onclick="sendWhatsapp('${d.name}', ${d.amount}, '${d.curr}', '${d.phone}', '${d.type}')" class="bg-green-500 hover:bg-green-600 text-white text-xs px-2.5 py-1 rounded-lg font-bold">تذكير 💬</button>` : '<span class="text-xs text-gray-400">لا يوجد رقم</span>'}
-                    </td>
-                    <td class="py-2.5 text-center">
-                        <button onclick="settleDebt(${idx})" class="bg-blue-600 text-white text-xs px-2 py-1 rounded-lg font-bold">تسوية ✓</button>
-                    </td>
-                `;
-                debtsTbody.appendChild(tr);
-            });
-
-            document.getElementById('total-receivable').innerText = `${recEgp.toLocaleString()} EGP / ${recRub.toLocaleString()} RUB`;
-            document.getElementById('total-payable').innerText = `${payEgp.toLocaleString()} EGP / ${payRub.toLocaleString()} RUB`;
-
-            // الجمعيات
-            const assocContainer = document.getElementById('assoc-list');
-            assocContainer.innerHTML = '';
-            (appState.associations || []).forEach((a, idx) => {
-                const card = document.createElement('div');
-                card.className = "p-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 flex justify-between items-center";
-                card.innerHTML = `
-                    <div>
-                        <div class="font-black text-base text-gray-800 dark:text-white">${a.name}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-300 mt-1">القبض: <b class="text-green-600 dark:text-green-400">${a.payout.toLocaleString()}</b> | القسط: <b>${a.monthly.toLocaleString()}</b></div>
-                        <div class="text-xs text-indigo-600 dark:text-indigo-400 font-bold mt-1">📅 موعد دورك: ${a.date}</div>
-                    </div>
-                    <button onclick="deleteAssoc(${idx})" class="text-red-500 font-bold text-sm bg-red-50 dark:bg-red-950 p-2 rounded-xl">حذف ✕</button>
-                `;
-                assocContainer.appendChild(card);
-            });
-
-            // قسم المستندات والملفات المحفوظة
-            const docsContainer = document.getElementById('docs-grid');
-            docsContainer.innerHTML = '';
-            (appState.documents || []).forEach((doc, idx) => {
-                const card = document.createElement('div');
-                card.className = "p-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 space-y-3 relative";
-                
-                let filePreview = '';
-                if(doc.fileData) {
-                    if(doc.fileType && doc.fileType.includes('image')) {
-                        filePreview = `<img src="${doc.fileData}" class="w-full h-32 object-cover rounded-xl border border-gray-200 mb-2">`;
-                    } else {
-                        filePreview = `<div class="p-3 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded-xl text-center text-xs font-bold mb-2">📄 ملف PDF محفوظ</div>`;
-                    }
-                }
-
-                card.innerHTML = `
-                    <button onclick="deleteDoc(${idx})" class="absolute top-3 left-3 text-red-500 font-bold text-xs bg-red-100 dark:bg-red-950 px-2 py-1 rounded-lg">حذف ✕</button>
-                    ${filePreview}
-                    <div>
-                        <div class="font-black text-base text-gray-800 dark:text-white">${doc.title}</div>
-                        ${doc.number ? `<div class="text-xs text-gray-500 dark:text-gray-300 mt-0.5">رقم الوثيقة: <b>${doc.number}</b></div>` : ''}
-                        ${doc.expiry ? `<div class="text-xs text-blue-600 dark:text-blue-400 font-bold mt-0.5">تاريخ الانتهاء: ${doc.expiry}</div>` : ''}
-                    </div>
-                    ${doc.fileData ? `
-                        <div class="flex gap-2 border-t border-gray-200 dark:border-gray-600 pt-3">
-                            <a href="${doc.fileData}" target="_blank" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-1.5 rounded-lg text-xs font-bold">معاينة 👁️</a>
-                            <a href="${doc.fileData}" download="${doc.title}" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-center py-1.5 rounded-lg text-xs font-bold">تنزيل 📥</a>
-                        </div>
-                    ` : ''}
-                `;
-                docsContainer.appendChild(card);
-            });
+        function togglePrayer(key) {
+            appState.dailyPrayers[key] = appState.dailyPrayers[key] === 1 ? 0 : 1;
+            saveData();
+            renderPrayers();
         }
 
-        // حفظ المستند مع رفع الملف
-        document.getElementById('doc-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (prompt("أدخل كلمة السر لحفظ المستند:") === PASSWORD) {
-                const title = document.getElementById('doc-title').value;
-                const number = document.getElementById('doc-number').value;
-                const expiry = document.getElementById('doc-expiry').value;
-                const fileInput = document.getElementById('doc-file');
-
-                const processAndSave = (fileData, fileType) => {
-                    if (!appState.documents) appState.documents = [];
-                    appState.documents.unshift({ title, number, expiry, fileData, fileType });
-                    document.getElementById('doc-form').reset();
-                    saveData();
-                    updateUI();
-                };
-
-                if (fileInput.files && fileInput.files[0]) {
-                    const file = fileInput.files[0];
-                    const reader = new FileReader();
-                    reader.onload = function(evt) {
-                        processAndSave(evt.target.result, file.type);
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    processAndSave('', '');
-                }
-            } else alert("كلمة السر غير صحيحة!");
-        });
-
-        function deleteDoc(idx) {
-            if (prompt("أدخل كلمة السر لحذف المستند:") === PASSWORD) {
-                appState.documents.splice(idx, 1);
+        function decreaseMissed(key) {
+            if (appState.missedPrayers[key] > 0) {
+                appState.missedPrayers[key]--;
                 saveData();
-                updateUI();
-            } else alert("كلمة السر غير صحيحة!");
-        }
-
-        // باقي العمليات والوظائف
-        document.getElementById('trans-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (prompt("أدخل كلمة السر لحفظ العملية:") === PASSWORD) {
-                const type = document.getElementById('t-type').value;
-                const desc = document.getElementById('t-desc').value;
-                const amount = parseFloat(document.getElementById('t-amount').value);
-                const bank = document.getElementById('t-bank').value;
-                const category = document.getElementById('t-cat').value;
-
-                if (type === 'income') appState.balances[bank] += amount;
-                else appState.balances[bank] -= amount;
-
-                if(!appState.transactions) appState.transactions = [];
-                appState.transactions.unshift({ type, desc, amount, bank, category, date: new Date().toLocaleDateString('ar-EG') });
-                document.getElementById('trans-form').reset();
-                saveData();
-                updateUI();
-            } else alert("كلمة السر غير صحيحة!");
-        });
-
-        function deleteTrans(idx) {
-            if (prompt("أدخل كلمة السر للحذف:") === PASSWORD) {
-                const item = appState.transactions[idx];
-                if (item.type === 'income') appState.balances[item.bank] -= item.amount;
-                else appState.balances[item.bank] += item.amount;
-                appState.transactions.splice(idx, 1);
-                saveData();
-                updateUI();
-            } else alert("كلمة السر غير صحيحة!");
-        }
-
-        document.getElementById('debt-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (prompt("أدخل كلمة السر لتسجيل الدين:") === PASSWORD) {
-                const type = document.getElementById('d-type').value;
-                const name = document.getElementById('d-name').value;
-                const amount = parseFloat(document.getElementById('d-amount').value);
-                const curr = document.getElementById('d-curr').value;
-                const phone = document.getElementById('d-phone').value;
-
-                if (!appState.debts) appState.debts = [];
-                appState.debts.unshift({ type, name, amount, curr, phone });
-                document.getElementById('debt-form').reset();
-                saveData();
-                updateUI();
-            } else alert("كلمة السر غير صحيحة!");
-        });
-
-        function settleDebt(idx) {
-            if (prompt("أدخل كلمة السر لتسوية وحذف هذا الدين:") === PASSWORD) {
-                appState.debts.splice(idx, 1);
-                saveData();
-                updateUI();
-            } else alert("كلمة السر غير صحيحة!");
-        }
-
-        function sendWhatsapp(name, amount, curr, phone, type) {
-            let msg = type === 'receivable' 
-                ? `أهلاً بك يا ${name}، تذكير ودي بشأن المبلغ المتبقي قدره (${amount} ${curr}). شكراً لك!`
-                : `أهلاً بك، تذكير بشأن الدين المستحق لك قدره (${amount} ${curr}). سيتم السداد قريبًا إن شاء الله.`;
-            let cleanPhone = phone.replace(/[^0-9]/g, '');
-            window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
-
-        document.getElementById('assoc-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (prompt("أدخل كلمة السر لإضافة الجمعية:") === PASSWORD) {
-                const name = document.getElementById('a-name').value;
-                const payout = parseFloat(document.getElementById('a-payout').value);
-                const monthly = parseFloat(document.getElementById('a-monthly').value);
-                const date = document.getElementById('a-date').value;
-
-                if (!appState.associations) appState.associations = [];
-                appState.associations.unshift({ name, payout, monthly, date });
-                document.getElementById('assoc-form').reset();
-                saveData();
-                updateUI();
-            } else alert("كلمة السر غير صحيحة!");
-        });
-
-        function deleteAssoc(idx) {
-            if (prompt("أدخل كلمة السر لحذف الجمعية:") === PASSWORD) {
-                appState.associations.splice(idx, 1);
-                saveData();
-                updateUI();
-            } else alert("كلمة السر غير صحيحة!");
-        }
-
-        function toggleDailyPrayer(k) {
-            if (appState.dailyPrayers[k] === -1) {
-                if (prompt("أدخل كلمة السر لتأكيد صلاة (" + prayerNames[k] + "):") === PASSWORD) { 
-                    appState.dailyPrayers[k] = 0; saveData(); updateUI(); 
-                } else alert("كلمة السر غير صحيحة!");
-            } else {
-                if (prompt("أدخل كلمة السر لإرجاع صلاة (" + prayerNames[k] + ") إلى (-1):") === PASSWORD) { 
-                    appState.dailyPrayers[k] = -1; saveData(); updateUI(); 
-                } else alert("كلمة السر غير صحيحة!");
+                renderPrayers();
             }
         }
 
-        function resetDailyPrayers() {
-            if (prompt("أدخل كلمة السر لإعادة ضبط الصلوات اليومية بالكامل:") === PASSWORD) {
-                appState.dailyPrayers = { fajr: -1, dhuhr: -1, asr: -1, maghrib: -1, isha: -1 };
-                saveData(); updateUI();
-            } else alert("كلمة السر غير صحيحة!");
+        function renderPrayers() {
+            // 1. عرض أزرار صلوات اليوم
+            const grid = document.getElementById('daily-prayers-grid');
+            grid.innerHTML = '';
+            PRAYER_KEYS.forEach(key => {
+                const done = appState.dailyPrayers[key] === 1;
+                grid.innerHTML += `
+                    <button onclick="togglePrayer('${key}')" class="p-3 rounded-2xl border text-center transition ${done ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600'}">
+                        <div class="text-xs font-bold">${prayerNames[key]}</div>
+                        <div class="text-lg mt-1 font-black">${done ? '🟢 أُدِّيَت' : '🔴 لم تُصَلَّ'}</div>
+                    </button>
+                `;
+            });
+
+            // 2. عرض السجل التاريخي
+            const historyList = document.getElementById('prayer-history-list');
+            historyList.innerHTML = '';
+            if (!appState.prayerLogs || appState.prayerLogs.length === 0) {
+                historyList.innerHTML = '<p class="text-xs text-gray-400 py-2">لا يوجد سجلات سابقة بعد، سيبدأ التسجيل التلقائي نهاية اليوم.</p>';
+            } else {
+                appState.prayerLogs.forEach(log => {
+                    let itemsHtml = '';
+                    PRAYER_KEYS.forEach(k => {
+                        const isDone = log.prayers && log.prayers[k] === 1;
+                        itemsHtml += `<span class="text-xs px-2 py-0.5 rounded ${isDone ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">${prayerNames[k]}: ${isDone ? '🟢' : '🔴'}</span>`;
+                    });
+                    historyList.innerHTML += `
+                        <div class="py-2 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                            <span class="text-xs font-bold text-gray-700 dark:text-gray-300">${log.date}</span>
+                            <div class="flex flex-wrap gap-1">${itemsHtml}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            // 3. عرض جدول الصلوات الفائتة
+            const missedList = document.getElementById('missed-prayers-list');
+            missedList.innerHTML = '';
+            let totalMissed = 0;
+            PRAYER_KEYS.forEach(key => {
+                const count = Math.max(0, appState.missedPrayers[key] || 0);
+                totalMissed += count;
+                missedList.innerHTML += `
+                    <div class="flex justify-between items-center py-2">
+                        <span class="text-sm font-bold text-gray-300">${prayerNames[key]}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg font-black text-red-400">${count}</span>
+                            <button onclick="decreaseMissed('${key}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1 rounded-lg">قضاء -1 🟢</button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('total-missed-display').innerText = totalMissed;
         }
 
-        function prayMissed(k) {
-            if (prompt("أدخل كلمة السر لقضاء صلاة (" + prayerNames[k] + "):") === PASSWORD) {
-                if (appState.missedPrayers[k] < 0) { appState.missedPrayers[k] += 1; saveData(); updateUI(); }
-            } else alert("كلمة السر غير صحيحة!");
-        }
-
-        function editMissed(k) {
-            if (prompt("أدخل كلمة السر لتعديل صلاة (" + prayerNames[k] + "):") === PASSWORD) {
-                const val = prompt("أدخل العدد الجديد بالسالب:", appState.missedPrayers[k]);
-                if (val !== null && !isNaN(val)) {
-                    let n = parseInt(val);
-                    appState.missedPrayers[k] = n > 0 ? -n : n;
-                    saveData(); updateUI();
-                }
-            } else alert("كلمة السر غير صحيحة!");
+        function updateUI() {
+            checkNewDay();
+            renderPrayers();
         }
     </script>
 </body>
