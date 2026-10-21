@@ -58,75 +58,72 @@ jobs:
           npx cap init "Abo Said" "com.abosaid.app" --web-dir www
           npx cap add android
 
-      # بناء و حقن الـ 10 ودجات الحقيقية الفعّالة
-      - name: Inject 10 Native App Widgets
+      # بناء وحقن ودجة أندرويد بشكل متوافق 100% مع أجهزة أندرويد الحديثة
+      - name: Inject Fixed Native Widget
         run: |
           mkdir -p android/app/src/main/res/layout
           mkdir -p android/app/src/main/res/drawable
           mkdir -p android/app/src/main/res/xml
           mkdir -p android/app/src/main/java/com/abosaid/app
 
-          # خلفية زجاجية موحدة للودجات
+          # 1. تصميم خلفية زجاجية كحلي بإطار شفاف
           cat << 'EOF' > android/app/src/main/res/drawable/widget_bg.xml
           <?xml version="1.0" encoding="utf-8"?>
           <shape xmlns:android="http://schemas.android.com/apk/res/android">
-              <solid android:color="#E60F172A" />
-              <corners android:radius="16dp" />
-              <stroke android:width="1.5dp" android:color="#FACC15" />
+              <solid android:color="#F00F172A" />
+              <corners android:radius="18dp" />
+              <stroke android:width="2dp" android:color="#38BDF8" />
           </shape>
           EOF
 
-          # تصميم الودجات العشرة (XML Layouts)
-          for i in {1..10}; do
-            cat << EOF > android/app/src/main/res/layout/widget_$i.xml
+          # 2. تصميم الواجهة المباشرة للودجة
+          cat << 'EOF' > android/app/src/main/res/layout/prayer_widget.xml
           <?xml version="1.0" encoding="utf-8"?>
-          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@+id/widget_container_$i"
+          <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/widget_root"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:orientation="vertical"
               android:background="@drawable/widget_bg"
-              android:padding="10dp"
-              android:gravity="center">
+              android:padding="12dp">
 
               <TextView
+                  android:id="@+id/txt_title"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:text="🕌 أبو سعيد - ودجة رقم $i"
+                  android:text="🕌 تطبيق أبو سعيد"
                   android:textColor="#38BDF8"
+                  android:textSize="14sp"
                   android:textStyle="bold"
-                  android:textSize="12sp" />
+                  android:layout_centerHorizontal="true" />
 
               <TextView
+                  android:id="@+id/txt_status"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:text="تحديث مباشر للبيانات والصلوات والأرصدة"
+                  android:text="مواقيت الصلاة وأرصدة الحسابات"
                   android:textColor="#FACC15"
-                  android:textStyle="bold"
-                  android:textSize="13sp"
-                  android:layout_marginTop="4dp" />
-          </LinearLayout>
+                  android:textSize="12sp"
+                  android:layout_below="@id/txt_title"
+                  android:layout_centerHorizontal="true"
+                  android:layout_marginTop="6dp" />
+          </RelativeLayout>
           EOF
-          done
 
-          # ملفات إعدادات الودجات العشرة (XML Info Providers)
-          for i in {1..10}; do
-            cat << EOF > android/app/src/main/res/xml/widget_info_$i.xml
+          # 3. ملف التعريف لمشغل الودجة
+          cat << 'EOF' > android/app/src/main/res/xml/prayer_widget_info.xml
           <?xml version="1.0" encoding="utf-8"?>
           <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-              android:minWidth="160dp"
+              android:minWidth="180dp"
               android:minHeight="70dp"
               android:updatePeriodMillis="1800000"
-              android:initialLayout="@layout/widget_$i"
+              android:initialLayout="@layout/prayer_widget"
               android:resizeMode="horizontal|vertical"
               android:widgetCategory="home_screen">
           </appwidget-provider>
           EOF
-          done
 
-          # إنشاء ملفات الجافا العشرة للودجات
-          for i in {1..10}; do
-            cat << EOF > android/app/src/main/java/com/abosaid/app/Widget$i.java
+          # 4. كود الجافا المتوافق
+          cat << 'EOF' > android/app/src/main/java/com/abosaid/app/PrayerWidget.java
           package com.abosaid.app;
 
           import android.app.PendingIntent;
@@ -136,41 +133,40 @@ jobs:
           import android.content.Intent;
           import android.widget.RemoteViews;
 
-          public class Widget$i extends AppWidgetProvider {
+          public class PrayerWidget extends AppWidgetProvider {
               @Override
               public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
                   for (int appWidgetId : appWidgetIds) {
-                      RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_$i);
+                      RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.prayer_widget);
+                      
                       Intent intent = new Intent(context, MainActivity.class);
                       PendingIntent pendingIntent = PendingIntent.getActivity(
                           context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
                       );
-                      views.setOnClickPendingIntent(R.id.widget_container_$i, pendingIntent);
+                      
+                      views.setOnClickPendingIntent(R.id.widget_root, pendingIntent);
                       appWidgetManager.updateAppWidget(appWidgetId, views);
                   }
               }
           }
           EOF
-          done
 
-          # حقن واستجيل الـ 10 ودجات في ملف AndroidManifest.xml
+          # 5. التسجيل الصحيح في AndroidManifest
           python3 -c '
           with open("android/app/src/main/AndroidManifest.xml", "r") as f:
               content = f.read()
 
-          receivers = ""
-          for i in range(1, 11):
-              receivers += f"""
-              <receiver android:name=\".Widget{i}\" android:exported=\"true\">
+          receiver = """
+              <receiver android:name="com.abosaid.app.PrayerWidget" android:exported="true">
                   <intent-filter>
-                      <action android:name=\"android.appwidget.action.APPWIDGET_UPDATE\" />
+                      <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                   </intent-filter>
-                  <meta-data android:name=\"android.appwidget.provider\" android:resource=\"@xml/widget_info_{i}\" />
+                  <meta-data android:name="android.appwidget.provider" android:resource="@xml/prayer_widget_info" />
               </receiver>
-              """
+          </application>
+          """
 
-          receivers += "</application>"
-          content = content.replace("</application>", receivers)
+          content = content.replace("</application>", receiver)
 
           with open("android/app/src/main/AndroidManifest.xml", "w") as f:
               f.write(content)
