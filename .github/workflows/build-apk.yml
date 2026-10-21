@@ -58,7 +58,7 @@ jobs:
           npx cap init "Abo Said" "com.abosaid.app" --web-dir www
           npx cap add android
 
-      # إضافة ملفات ودجة أندرويد (Android Native Widget)
+      # إضافة ملفات ودجة أندرويد (Android Native App Widget)
       - name: Inject Android Native App Widget
         run: |
           # 1. إنشاء مجلد الموارد Layout & XML
@@ -66,9 +66,10 @@ jobs:
           mkdir -p android/app/src/main/res/xml
           mkdir -p android/app/src/main/java/com/abosaid/app
 
-          # 2. تصميم شكل الودجة (XML Layout)
+          # 2. تصميم شكل الودجة الصحيح (XML Layout)
           cat << 'EOF' > android/app/src/main/res/layout/prayer_widget.xml
-          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/auto"
+          <?xml version="1.0" encoding="utf-8"?>
+          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
