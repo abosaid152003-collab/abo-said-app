@@ -32,16 +32,16 @@ jobs:
           rm -rf android www package*.json capacitor.config.* assets
           mkdir -p www assets
           
-          # إجبار التحديث لمنع الكاش على التليفون
+          # منع الكاش
           VERSION=$(date +%s)
           sed -i "s/index.html/index.html?v=$VERSION/g" manifest.json || true
 
-          # نسخ ملف HTML الأساسي بشكل مباشر وصريح
+          # نسخ ملفات الـ Web
           cp -f index.html www/
           cp -f manifest.json www/ 2>/dev/null || true
           cp -f "ahmed logo.png" www/ 2>/dev/null || true
 
-          # تجهيز الأيقونات
+          # الأيقونات
           cp -f "ahmed logo.png" assets/icon-only.png 2>/dev/null || true
           cp -f "ahmed logo.png" assets/icon-foreground.png 2>/dev/null || true
           cp -f "ahmed logo.png" assets/icon-background.png 2>/dev/null || true
@@ -57,6 +57,88 @@ jobs:
         run: |
           npx cap init "Abo Said" "com.abosaid.app" --web-dir www
           npx cap add android
+
+      # إضافة ملفات ودجة أندرويد (Android Native Widget)
+      - name: Inject Android Native App Widget
+        run: |
+          # 1. إنشاء مجلد الموارد Layout & XML
+          mkdir -p android/app/src/main/res/layout
+          mkdir -p android/app/src/main/res/xml
+          mkdir -p android/app/src/main/java/com/abosaid/app
+
+          # 2. تصميم شكل الودجة (XML Layout)
+          cat << 'EOF' > android/app/src/main/res/layout/prayer_widget.xml
+          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:background="#1e3a8a"
+              android:padding="12dp"
+              android:gravity="center">
+
+              <TextView
+                  android:id="@+id/widget_title"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="🕌 مواقيت صلاة أوفا (Ufa)"
+                  android:textColor="#ffffff"
+                  android:textStyle="bold"
+                  android:textSize="14sp" />
+
+              <TextView
+                  android:id="@+id/widget_timer"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="أبو سعيد - متابعة الصلوات"
+                  android:textColor="#facc15"
+                  android:textStyle="bold"
+                  android:textSize="16sp"
+                  android:layout_marginTop="6dp" />
+          </LinearLayout>
+          EOF
+
+          # 3. ملف إعدادات الودجة لشاشة الموبايل
+          cat << 'EOF' > android/app/src/main/res/xml/prayer_widget_info.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+              android:minWidth="180dp"
+              android:minHeight="70dp"
+              android:updatePeriodMillis="1800000"
+              android:initialLayout="@layout/prayer_widget"
+              android:resizeMode="horizontal|vertical"
+              android:widgetCategory="home_screen">
+          </appwidget-provider>
+          EOF
+
+          # 4. كود البرمجة الأندرويد لتشغيل الودجة
+          cat << 'EOF' > android/app/src/main/java/com/abosaid/app/PrayerWidget.java
+          package com.abosaid.app;
+
+          import android.appwidget.AppWidgetManager;
+          import android.appwidget.AppWidgetProvider;
+          import android.content.Context;
+          import android.widget.RemoteViews;
+
+          public class PrayerWidget extends AppWidgetProvider {
+              @Override
+              public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+                  for (int appWidgetId : appWidgetIds) {
+                      RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.prayer_widget);
+                      appWidgetManager.updateAppWidget(appWidgetId, views);
+                  }
+              }
+          }
+          EOF
+
+          # 5. تسجيل الودجة في ملف AndroidManifest.xml
+          sed -i '/<\/application>/i \
+          <receiver android:name=".PrayerWidget" android:exported="true">\
+              <intent-filter>\
+                  <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />\
+              </intent-filter>\
+              <meta-data android:name="android.appwidget.action.APPWIDGET_PROVIDER" android:resource="@xml/prayer_widget_info" />\
+          </receiver>' android/app/src/main/AndroidManifest.xml
+
           npx cap sync android
 
       - name: Generate App Icon & Splash
